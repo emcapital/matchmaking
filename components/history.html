@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmashMatch - Integrated Activity Workspace</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght=300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body { font-family: 'Poppins', sans-serif; }
+        
+        .shuttle-rotate { animation: spin 24s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        
+        .view-transition-enter {
+            animation: viewFadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        @keyframes viewFadeIn {
+            from { opacity: 0; transform: translateY(8px); filter: blur(2px); }
+            to { opacity: 1; transform: translateY(0); filter: blur(0); }
+        }
+
+        .pulse-glow-1 { animation: aurora-1 12s ease infinite alternate; }
+        .pulse-glow-2 { animation: aurora-2 16s ease infinite alternate; }
+        @keyframes aurora-1 { 0% { transform: translate(0px, 0px) scale(1); } 100% { transform: translate(30px, -40px) scale(1.1); } }
+        @keyframes aurora-2 { 0% { transform: translate(0px, 0px) scale(1); } 100% { transform: translate(-30px, 30px) scale(0.95); } }
+
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.3); }
+        ::-webkit-scrollbar-thumb { background: rgba(51, 65, 85, 0.5); border-radius: 100px; }
+    </style>
+</head>
+<body class="bg-[#030712] text-slate-100 min-h-screen flex flex-col md:flex-row antialiased selection:bg-emerald-500 selection:text-slate-900 overflow-x-hidden">
+
+    <!-- AMBIENT BACKGROUND ANIMATIONS -->
+    <div class="fixed inset-0 bg-[linear-gradient(to_right,#0f172a_1px,transparent_1px),linear-gradient(to_bottom,#0f172a_1px,transparent_1px)] bg-[size:5rem_5rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_80%,transparent_100%)] z-0 opacity-20 pointer-events-none"></div>
+    <div class="fixed top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0 opacity-20">
+        <div class="absolute top-[-10%] left-[-10%] w-[35rem] h-[35rem] bg-emerald-500/10 rounded-full filter blur-[120px] pulse-glow-1"></div>
+        <div class="absolute bottom-[-10%] right-[-10%] w-[35rem] h-[35rem] bg-cyan-500/10 rounded-full filter blur-[120px] pulse-glow-2"></div>
+    </div>
+
+    <!-- RESPONSIVE MOBILE TOP BAR HEADER -->
+    <header class="w-full bg-slate-950/80 backdrop-blur-xl border-b border-slate-900 px-5 py-4 flex items-center justify-between md:hidden sticky top-0 z-50">
+        <div class="flex items-center gap-2.5">
+            <div class="inline-flex items-center justify-center w-7 h-7 bg-gradient-to-tr from-emerald-500 to-cyan-400 rounded-lg shadow-[0_0_15px_rgba(16,185,129,0.2)]">
+                <i class="fa-solid fa-circle-nodes text-slate-950 text-xs shuttle-rotate"></i>
+            </div>
+            <span class="text-sm font-bold tracking-tight text-white">SmashMatch</span>
+        </div>
+        <button onclick="toggleMobileMenu()" class="w-9 h-9 flex items-center justify-center border border-slate-800 rounded-xl bg-slate-900/50 text-slate-300 hover:text-white transition-colors">
+            <i id="mobile-menu-icon" class="fa-solid fa-bars text-sm"></i>
+        </button>
+    </header>
+
+    <!-- NAVIGATION SIDEBAR -->
+    <aside id="sidebar-menu" class="fixed inset-y-0 left-0 transform -translate-x-full md:translate-x-0 md:sticky md:h-screen w-64 lg:w-72 border-r border-slate-900/60 bg-slate-950/95 md:bg-slate-950/40 backdrop-blur-2xl flex flex-col z-40 flex-shrink-0 transition-transform duration-300 ease-in-out">
+        <div class="p-6 border-b border-slate-900 hidden md:flex items-center gap-3.5">
+            <div class="inline-flex items-center justify-center w-8 h-8 bg-gradient-to-tr from-emerald-500 to-cyan-400 rounded-lg shadow-[0_0_20px_rgba(16,185,129,0.2)]">
+                <i class="fa-solid fa-circle-nodes text-slate-950 text-xs shuttle-rotate"></i>
+            </div>
+            <div class="flex flex-col">
+                <span class="text-xs font-bold tracking-tight text-white">SmashMatch Hub</span>
+                <span class="text-[9px] font-bold tracking-widest text-slate-500 uppercase mt-0.5">Engine Suite</span>
+            </div>
+        </div>
+
+        <div class="p-4 space-y-1 flex-grow overflow-y-auto mt-16 md:mt-0">
+            <div class="text-[10px] font-bold uppercase tracking-widest text-slate-500 px-3 mb-2">Ecosystem Logistics</div>
+            
+            <!-- NAV OPTION 1: EVENTS -->
+            <button id="nav-btn-events" onclick="activateSectionView('events')" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold tracking-wide transition-all duration-200 bg-gradient-to-r from-emerald-500/10 to-cyan-500/5 border border-emerald-500/20 text-emerald-400">
+                <div class="flex items-center gap-3">
+                    <i class="fa-solid fa-calendar-days text-sm"></i>
+                    <span>Recent Events</span>
+                </div>
+                <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-1.5 py-0.5 rounded text-[9px] font-mono font-bold">02</span>
+            </button>
+
+            <!-- NAV OPTION 2: ROSTER (DYNAMICALLY TRIGGERS CANVAS ADJUSTMENT) -->
+            <button id="nav-btn-roster" onclick="activateSectionView('roster')" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold tracking-wide border border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-900/40 transition-all duration-200">
+                <div class="flex items-center gap-3">
+                    <i class="fa-solid fa-users text-sm"></i>
+                    <span>Player Matrix Roster</span>
+                </div>
+                <span class="bg-slate-900 text-slate-500 border border-slate-800 px-1.5 py-0.5 rounded text-[9px] font-mono font-bold" id="sidebar-counter-player">02</span>
+            </button>
+
+            <div class="h-px bg-slate-900 my-4 mx-2"></div>
+            <div class="text-[10px] font-bold uppercase tracking-widest text-slate-500 px-3 mb-2">Workspace Controls</div>
+            
+            <button onclick="openEnrollModal(); closeMobileMenu();" class="w-full flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-400 hover:text-emerald-400 transition-all duration-200">
+                <i class="fa-solid fa-user-plus text-slate-500"></i>
+                <span>Enroll New Profile</span>
+            </button>
+        </div>
+
+        <div class="p-4 border-t border-slate-900 bg-slate-950/20 text-[10px]">
+            <div class="flex items-center justify-between text-slate-500 font-bold tracking-wider uppercase">
+                <span>Cluster Diagnostics</span>
+                <span class="text-emerald-400 flex items-center gap-1.5"><span class="w-1 h-1 rounded-full bg-emerald-400 animate-pulse"></span> Sync</span>
+            </div>
+        </div>
+    </aside>
+
+    <!-- MAIN APP CANVAS FRAME -->
+    <main class="flex-grow min-w-0 p-4 sm:p-6 lg:p-8 z-10 relative flex flex-col justify-between gap-10">
+        
+        <!-- MAIN SECTION ROUTER CONTAINER -->
+        <div class="w-full max-w-5xl mx-auto">
+            
+            <!-- SECTION LAYER A: RECENT COMPLETED EVENTS (DEFAULT DISPLAY) -->
+            <section id="events-section" class="space-y-4 view-transition-enter">
+                <div>
+                    <h1 class="text-lg font-extrabold tracking-tight text-white flex items-center gap-2">
+                        <i class="fa-solid fa-calendar-day text-emerald-400 text-sm"></i> Recent Events
+                    </h1>
+                    <p class="text-slate-400 text-[11px] mt-0.5">Select a cluster sequence to inspect completed performances.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="events-grid-wrapper">
+                    <!-- Event Card 1 -->
+                    <div onclick="openEventPopup('event-01')" class="bg-slate-900/20 border border-slate-800/80 backdrop-blur-2xl rounded-xl p-4 shadow-xl flex flex-col justify-between gap-4 group hover:border-emerald-500/30 hover:bg-slate-900/40 transition-all duration-300 cursor-pointer relative overflow-hidden">
+                        <div class="flex items-center justify-between border-b border-slate-900/80 pb-2">
+                            <span class="px-2 py-0.5 bg-slate-950 border border-slate-800 text-emerald-400 rounded text-[9px] font-bold uppercase tracking-wider">Tournament</span>
+                            <span class="text-[10px] font-medium text-slate-500">June 15, 2026</span>
+                        </div>
+                        <div>
+                            <h3 class="text-xs font-bold text-slate-200 group-hover:text-white transition-colors">Summer Shuttle Open Championship</h3>
+                            <p class="text-slate-400 text-[11px] mt-1 line-clamp-2">Elite pairs and regional divisions tracking diagnostics setup.</p>
+                        </div>
+                        <div class="flex items-center justify-between mt-1 pt-2 border-t border-slate-900/40 text-[9px] font-semibold tracking-wide text-slate-500">
+                            <span class="flex items-center gap-1.5"><i class="fa-solid fa-circle-nodes text-slate-600"></i> 2 Match Nodes</span>
+                            <span class="text-slate-400 group-hover:text-emerald-400 text-[10px] transition-colors font-medium flex items-center gap-1">
+                                View Logs <i class="fa-solid fa-arrow-right text-[9px]"></i>
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Event Card 2 -->
+                    <div onclick="openEventPopup('event-02')" class="bg-slate-900/20 border border-slate-800/80 backdrop-blur-2xl rounded-xl p-4 shadow-xl flex flex-col justify-between gap-4 group hover:border-cyan-500/30 hover:bg-slate-900/40 transition-all duration-300 cursor-pointer relative overflow-hidden">
+                        <div class="flex items-center justify-between border-b border-slate-900/80 pb-2">
+                            <span class="px-2 py-0.5 bg-slate-950 border border-slate-800 text-cyan-400 rounded text-[9px] font-bold uppercase tracking-wider">Club Ladder</span>
+                            <span class="text-[10px] font-medium text-slate-500">June 12, 2026</span>
+                        </div>
+                        <div>
+                            <h3 class="text-xs font-bold text-slate-200 group-hover:text-white transition-colors">SmashMatch Weekly Social Scramble</h3>
+                            <p class="text-slate-400 text-[11px] mt-1 line-clamp-2">Casual weekend mixer performance metrics matrix configuration.</p>
+                        </div>
+                        <div class="flex items-center justify-between mt-1 pt-2 border-t border-slate-900/40 text-[9px] font-semibold tracking-wide text-slate-500">
+                            <span class="flex items-center gap-1.5"><i class="fa-solid fa-circle-nodes text-slate-600"></i> 1 Match Node</span>
+                            <span class="text-slate-400 group-hover:text-cyan-400 text-[10px] transition-colors font-medium flex items-center gap-1">
+                                View Logs <i class="fa-solid fa-arrow-right text-[9px]"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION LAYER B: FULL INTEGRATED CANVAS ROSTER (HIDDEN UNTIL NAV LINK CLICK) -->
+            <section id="roster-section" class="hidden bg-[#090d16]/30 border border-slate-900/80 backdrop-blur-3xl rounded-2xl p-5 shadow-2xl flex flex-col gap-4">
+                
+                <!-- HEADER & LIVE SEARCH CONTROLLER INTERFACE -->
+                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 border-b border-slate-900 pb-4">
+                    <div>
+                        <h2 class="text-sm font-bold text-slate-100 flex items-center gap-2">
+                            <i class="fa-solid fa-users text-cyan-400"></i> Player Matrix Roster
+                        </h2>
+                        <p class="text-slate-500 text-[11px] mt-0.5">Ecosystem arrays tracking live active profile entities runtime logs.</p>
+                    </div>
+
+                    <!-- SEARCH BAR LOGISTICS ACTION GRID -->
+                    <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 w-full lg:w-auto">
+                        <div class="relative flex-grow sm:w-56">
+                            <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
+                            <input type="text" id="player-matrix-search" oninput="executeRosterSearch()" autocomplete="off" class="w-full bg-[#040711] border border-slate-800 rounded-xl py-2 pl-9 pr-4 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/20 transition-all font-medium" placeholder="Search name or squad...">
+                        </div>
+                        <button onclick="openEnrollModal()" class="bg-gradient-to-r from-emerald-500 to-cyan-500 text-slate-950 text-xs font-bold tracking-wide rounded-xl px-3.5 py-2 shadow-lg shadow-emerald-500/10 hover:opacity-95 transition-all duration-200 whitespace-nowrap flex items-center justify-center gap-1.5">
+                            <i class="fa-solid fa-user-plus text-xs"></i> Enroll Profile
+                        </button>
+                    </div>
+                </div>
+
+                <!-- RANK SKILL MATRIX PILL BADGE FILTERS -->
+                <div class="p-1.5 bg-slate-950/40 border border-slate-900 rounded-xl flex flex-wrap items-center gap-1">
+                    <button onclick="filterPlayerRoster('All', this)" class="filter-badge-btn px-2.5 py-1 text-[10px] font-bold tracking-wide rounded-lg transition-all duration-200 bg-slate-900 border border-slate-800 text-emerald-400">All Levels</button>
+                    <button onclick="filterPlayerRoster('Beginner', this)" class="filter-badge-btn px-2.5 py-1 text-[10px] font-bold tracking-wide rounded-lg transition-all duration-200 text-slate-400 hover:text-slate-200 hover:bg-slate-900/40">Beginner</button>
+                    <button onclick="filterPlayerRoster('Intermediate', this)" class="filter-badge-btn px-2.5 py-1 text-[10px] font-bold tracking-wide rounded-lg transition-all duration-200 text-slate-400 hover:text-slate-200 hover:bg-slate-900/40">Intermediate</button>
+                    <button onclick="filterPlayerRoster('Advanced', this)" class="filter-badge-btn px-2.5 py-1 text-[10px] font-bold tracking-wide rounded-lg transition-all duration-200 text-slate-400 hover:text-slate-200 hover:bg-slate-900/40">Advanced</button>
+                    <button onclick="filterPlayerRoster('Elite', this)" class="filter-badge-btn px-2.5 py-1 text-[10px] font-bold tracking-wide rounded-lg transition-all duration-200 text-slate-400 hover:text-slate-200 hover:bg-slate-900/40">Elite</button>
+                </div>
+
+                <!-- ACTIVE LIVE GRID ARRAY CONTAINER FRAME -->
+                <div class="relative min-h-[220px]">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="players-grid-wrapper">
+                        <!-- Profile Card 1 -->
+                        <div id="player-node-1" data-skill="Elite" class="player-node bg-slate-900/20 border border-slate-800/80 backdrop-blur-2xl rounded-xl p-3.5 shadow-xl hover:border-slate-700/60 transition-all duration-300 group flex flex-col justify-between gap-3">
+                            <div class="flex items-start justify-between gap-3 min-w-0 w-full">
+                                <div class="flex items-center gap-3 min-w-0">
+                                    <div class="node-avatar w-9 h-9 rounded-xl bg-gradient-to-tr from-rose-500 to-amber-400 p-px flex items-center justify-center flex-shrink-0 font-bold text-xs text-slate-200 shadow-lg">KZ</div>
+                                    <div class="truncate">
+                                        <h3 class="node-name text-xs font-bold text-slate-200 truncate group-hover:text-emerald-400 transition-colors">Kevin Zhang</h3>
+                                        <p class="text-[10px] font-semibold text-slate-500 mt-0.5 flex items-center gap-1">Team: <span class="node-team text-slate-400 font-medium">N/A</span></p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-1 flex-shrink-0">
+                                    <button onclick="openEditModal('player-node-1')" class="text-slate-500 hover:text-cyan-400 transition-colors p-1" title="Edit Profile"><i class="fa-solid fa-pen-to-square text-[10px]"></i></button>
+                                    <span class="node-badge px-1.5 py-0.5 bg-rose-500/10 border border-rose-500/20 text-rose-400 rounded-md text-[8px] font-bold uppercase tracking-wider">Elite</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Profile Card 2 -->
+                        <div id="player-node-2" data-skill="Advanced" class="player-node bg-slate-900/20 border border-slate-800/80 backdrop-blur-2xl rounded-xl p-3.5 shadow-xl hover:border-slate-700/60 transition-all duration-300 group flex flex-col justify-between gap-3">
+                            <div class="flex items-start justify-between gap-3 min-w-0 w-full">
+                                <div class="flex items-center gap-3 min-w-0">
+                                    <div class="node-avatar w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-500 to-emerald-400 p-px flex items-center justify-center flex-shrink-0 font-bold text-xs text-slate-200 shadow-lg">MV</div>
+                                    <div class="truncate">
+                                        <h3 class="node-name text-xs font-bold text-slate-200 truncate group-hover:text-emerald-400 transition-colors">Marcus Vance</h3>
+                                        <p class="text-[10px] font-semibold text-slate-500 mt-0.5 flex items-center gap-1">Team: <span class="node-team text-slate-300 font-medium bg-slate-950/60 px-1.5 py-0.5 rounded border border-slate-800">Apex Shuttlers</span></p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-1 flex-shrink-0">
+                                    <button onclick="openEditModal('player-node-2')" class="text-slate-500 hover:text-cyan-400 transition-colors p-1" title="Edit Profile"><i class="fa-solid fa-pen-to-square text-[10px]"></i></button>
+                                    <span class="node-badge px-1.5 py-0.5 bg-amber-500/10 border border-amber-500/20 text-amber-400 rounded-md text-[8px] font-bold uppercase tracking-wider">Advanced</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- REAL-TIME ZERO MATRIX SEARCH FALLBACK FRAME -->
+                    <div id="search-fallback-empty" class="hidden absolute inset-0 flex flex-col items-center justify-center p-6 text-center bg-[#090d16]/40 backdrop-blur-sm rounded-xl">
+                        <div class="w-8 h-8 rounded-xl border border-slate-800 bg-slate-950/80 flex items-center justify-center text-slate-500 mb-2 shadow-lg">
+                            <i class="fa-solid fa-user-slash text-xs"></i>
+                        </div>
+                        <h4 class="text-xs font-bold text-slate-300">No Matching Active Profiles</h4>
+                        <p class="text-[10px] text-slate-500 mt-0.5 max-w-xs">We couldn't find any registered parameters matching that selection string sequence.</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <footer class="w-full text-center border-t border-slate-900/60 pt-4 text-[9px] font-bold tracking-widest text-slate-600 uppercase">
+            &copy; SmashMatch Engine Platform Workspace
+        </footer>
+    </main>
+
+    <!-- POPUP MODAL: DETAILED RECENT MATCHES LOG INJECTION GRID -->
+    <div id="event-popup-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 invisible pointer-events-none">
+        <div id="event-popup-backdrop" onclick="closeEventPopup()" class="absolute inset-0 bg-slate-950/80 backdrop-blur-md opacity-0 transition-opacity duration-300"></div>
+        <div id="event-popup-card" class="transition-all duration-400 cubic-bezier(0.16, 1, 0.3, 1) opacity-0 scale-95 translate-y-4 w-full max-w-4xl bg-[#090d16] border border-slate-800 rounded-2xl shadow-2xl z-10 relative flex flex-col max-h-[85vh]">
+            <div class="p-4 border-b border-slate-900 flex items-start justify-between gap-4">
+                <div>
+                    <span class="text-[9px] font-bold text-emerald-400 uppercase tracking-widest block mb-1">Ecosystem Logistics Array</span>
+                    <h3 id="popup-event-title" class="text-xs font-bold text-slate-100">Event Matches Registry</h3>
+                    <p id="popup-event-desc" class="text-slate-400 text-[11px] mt-0.5">Extracting internal line match pairings config metrics.</p>
+                </div>
+                <button onclick="closeEventPopup()" class="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-white border border-slate-800 rounded-xl bg-slate-900/40 transition-colors">
+                    <i class="fa-solid fa-xmark text-sm"></i>
+                </button>
+            </div>
+            <div class="p-4 overflow-y-auto space-y-3 flex-grow bg-slate-950/20" id="popup-matches-target-grid"></div>
+        </div>
+    </div>
+
+    <!-- PROFILE ENROLLMENT INPUT SUBMISSION MODAL CONTAINER FRAME -->
+    <div id="enroll-modal" class="fixed inset-0 z-60 flex items-center justify-center p-4 invisible pointer-events-none">
+        <div id="enroll-backdrop" onclick="closeEnrollModal()" class="absolute inset-0 bg-slate-950/60 backdrop-blur-sm opacity-0 transition-opacity duration-300"></div>
+        <div id="enroll-card" class="transition-all duration-400 cubic-bezier(0.16, 1, 0.3, 1) opacity-0 scale-95 translate-y-4 w-full max-w-sm bg-[#0b0f19] border border-slate-800 rounded-2xl p-5 shadow-2xl z-10 relative">
+            <h3 id="modal-title" class="text-sm font-bold text-slate-100">Enroll Ecosystem Member</h3>
+            <p id="modal-desc" class="text-slate-500 text-[10px] mt-0.5 font-medium">Inject player arrays directly into the system database structure.</p>
+            
+            <form id="enroll-form" onsubmit="handleFormSubmission(event)" class="space-y-3 mt-4">
+                <input type="hidden" id="edit-node-id" value="">
+                <div>
+                    <label class="block text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Profile Name / Alias</label>
+                    <input type="text" id="player-name" required autocomplete="off" class="w-full bg-[#040711] border border-slate-800 rounded-xl py-2 px-3 text-xs text-white focus:outline-none focus:border-emerald-500/50 transition-all font-medium" placeholder="e.g., Lin Dan">
+                </div>
+                <div>
+                    <label class="block text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Assigned Team Squad</label>
+                    <input type="text" id="player-team" autocomplete="off" class="w-full bg-[#040711] border border-slate-800 rounded-xl py-2 px-3 text-xs text-white focus:outline-none focus:border-emerald-500/50 transition-all font-medium" placeholder="Leave empty for N/A">
+                </div>
+                <div>
+                    <label class="block text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Calculated Skill Rating</label>
+                    <select id="player-skill" class="w-full bg-[#040711] border border-slate-800 rounded-xl py-2 px-3 text-xs text-white focus:outline-none focus:border-emerald-500/50 transition-all font-medium cursor-pointer">
+                        <option value="Beginner">Beginner</option>
+                        <option value="Intermediate" selected>Intermediate</option>
+                        <option value="Advanced">Advanced</option>
+                        <option value="Elite">Elite</option>
+                    </select>
+                </div>
+                <div class="flex gap-2 text-xs font-bold pt-1">
+                    <button type="button" onclick="closeEnrollModal()" class="w-1/3 py-2 border border-slate-800 text-slate-400 rounded-xl hover:bg-slate-900 transition-colors">Cancel</button>
+                    <button type="submit" id="modal-submit-btn" class="w-2/3 py-2 bg-gradient-to-r from-emerald-500 to-cyan-500 text-slate-950 rounded-xl shadow-lg tracking-wide">Write Node Entry</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- TOAST POPUP NOTIFICATION CHANNELS -->
+    <div class="fixed bottom-4 right-4 left-4 sm:left-auto sm:w-80 z-70 pointer-events-none">
+        <div id="toast-container" class="space-y-2 flex flex-col justify-end items-end w-full"></div>
+    </div>
+
+    <!-- RUNTIME DATA INTERACTION CONTROL ENGINE -->
+    <script>
+        const eventDatabase = {
+            'event-01': {
+                title: "Summer Shuttle Open Championship",
+                desc: "Main division tournament setup tracking elite pairs and regional squad divisions.",
+                matches: [
+                    {
+                        court: "Court 03",
+                        timestamp: "June 15, 2026 • 14:22 PM",
+                        statusBadge: "Alpha Win",
+                        statusClass: "bg-emerald-500/10 border-emerald-500/20 text-emerald-400",
+                        sideAlphaPlayers: "Marcus Vance, Derrick Rose",
+                        sideAlphaTeam: "Apex Shuttlers",
+                        sideAlphaScore: "21",
+                        sideAlphaScoreClass: "text-emerald-400 animate-pulse",
+                        sideBetaPlayers: "Aaron Craig, Elena Rostova",
+                        sideBetaTeam: "N/A",
+                        sideBetaScore: "18",
+                        sideBetaScoreClass: "text-slate-400"
+                    }
+                ]
+            },
+            'event-02': {
+                title: "SmashMatch Weekly Social Scramble",
+                desc: "Casual weekend mixer performance tracking matrix for newly configured custom squads.",
+                matches: [
+                    {
+                        court: "Court 02",
+                        timestamp: "June 12, 2026 • 19:05 PM",
+                        statusBadge: "Alpha Win",
+                        statusClass: "bg-emerald-500/10 border-emerald-500/20 text-emerald-400",
+                        sideAlphaPlayers: "Elena Rostova, Kevin Zhang",
+                        sideAlphaTeam: "Mixed Node Combo",
+                        sideAlphaScore: "21",
+                        sideAlphaScoreClass: "text-emerald-400 animate-pulse",
+                        sideBetaPlayers: "Derrick Rose, Li Wei",
+                        sideBetaTeam: "Apex Shuttlers",
+                        sideBetaScore: "15",
+                        sideBetaScoreClass: "text-slate-400"
+                    }
+                ]
+            }
+        };
+
+        let currentActiveTierFilter = 'All';
+        let mobileMenuOpen = false;
+
+        // SINGLE PAGE ROUTING CONTROLLER BETWEEN CANVAS LAYERS
+        function activateSectionView(targetSection) {
+            const eventsSec = document.getElementById('events-section');
+            const rosterSec = document.getElementById('roster-section');
+            const btnEvents = document.getElementById('nav-btn-events');
+            const btnRoster = document.getElementById('nav-btn-roster');
+
+            closeMobileMenu();
+
+            if (targetSection === 'events') {
+                rosterSec.classList.add('hidden');
+                eventsSec.classList.remove('hidden');
+                eventsSec.classList.add('view-transition-enter');
+
+                // Active Tab Style Injection
+                btnEvents.className = "w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold tracking-wide transition-all duration-200 bg-gradient-to-r from-emerald-500/10 to-cyan-500/5 border border-emerald-500/20 text-emerald-400";
+                btnRoster.className = "w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold tracking-wide border border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-900/40 transition-all duration-200";
+            } else if (targetSection === 'roster') {
+                eventsSec.classList.add('hidden');
+                rosterSec.classList.remove('hidden');
+                rosterSec.classList.add('view-transition-enter');
+
+                // Active Tab Style Injection
+                btnRoster.className = "w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold tracking-wide transition-all duration-200 bg-gradient-to-r from-cyan-500/10 to-emerald-500/5 border border-cyan-500/20 text-cyan-400";
+                btnEvents.className = "w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold tracking-wide border border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-900/40 transition-all duration-200";
+            }
+        }
+
+        function toggleMobileMenu() {
+            const sidebar = document.getElementById('sidebar-menu');
+            const icon = document.getElementById('mobile-menu-icon');
+            if (!mobileMenuOpen) {
+                sidebar.classList.remove('-translate-x-full');
+                icon.className = "fa-solid fa-xmark text-sm";
+                mobileMenuOpen = true;
+            } else {
+                closeMobileMenu();
+            }
+        }
+        function closeMobileMenu() {
+            const sidebar = document.getElementById('sidebar-menu');
+            const icon = document.getElementById('mobile-menu-icon');
+            if(sidebar) sidebar.classList.add('-translate-x-full');
+            if(icon) icon.className = "fa-solid fa-bars text-sm";
+            mobileMenuOpen = false;
+        }
+
+        // EVENT SUMMARY LOG INJECTION ARRAY BUILDER
+        function openEventPopup(eventId) {
+            const eventData = eventDatabase[eventId];
+            if (!eventData) return;
+
+            document.getElementById('popup-event-title').innerText = eventData.title;
+            document.getElementById('popup-event-desc').innerText = eventData.desc;
+
+            const targetGrid = document.getElementById('popup-matches-target-grid');
+            targetGrid.innerHTML = '';
+
+            eventData.matches.forEach(match => {
+                const alphaTeam = match.sideAlphaTeam !== 'N/A' ? `<span class="text-slate-400 font-medium">${match.sideAlphaTeam}</span>` : `<span class="text-slate-500 font-medium">N/A</span>`;
+                const betaTeam = match.sideBetaTeam !== 'N/A' ? `<span class="text-slate-300 font-medium bg-slate-950/60 px-1.5 py-0.5 rounded border border-slate-800">${match.sideBetaTeam}</span>` : `<span class="text-slate-500 font-medium">N/A</span>`;
+
+                const cardHtml = `
+                    <div class="bg-slate-900/40 border border-slate-800/80 rounded-xl p-4 flex flex-col gap-3">
+                        <div class="flex items-center justify-between border-b border-slate-900 pb-2">
+                            <div class="flex items-center gap-2">
+                                <span class="px-2 py-0.5 bg-slate-950 border border-slate-800 text-cyan-400 rounded text-[9px] font-bold uppercase">${match.court}</span>
+                                <span class="text-[10px] font-medium text-slate-500">${match.timestamp}</span>
+                            </div>
+                            <span class="px-2 py-0.5 ${match.statusClass} rounded-md text-[9px] font-bold uppercase tracking-wider">${match.statusBadge}</span>
+                        </div>
+                        <div class="flex items-center justify-between gap-4 py-0.5">
+                            <div class="flex-1 min-w-0">
+                                <h4 class="text-xs font-bold text-slate-200 truncate">${match.sideAlphaPlayers}</h4>
+                                <p class="text-[10px] text-slate-500 mt-0.5">Team: ${alphaTeam}</p>
+                            </div>
+                            <div class="flex items-center gap-2 px-3 py-1.5 bg-slate-950/80 border border-slate-900 rounded-xl font-mono font-bold text-sm shadow-inner flex-shrink-0">
+                                <span class="${match.sideAlphaScoreClass}">${match.sideAlphaScore}</span>
+                                <span class="text-slate-600 font-sans">:</span>
+                                <span class="${match.sideBetaScoreClass}">${match.sideBetaScore}</span>
+                            </div>
+                            <div class="flex-1 min-w-0 text-right">
+                                <h4 class="text-xs font-semibold text-slate-400 truncate">${match.sideBetaPlayers}</h4>
+                                <p class="text-[10px] text-slate-500 mt-0.5">Team: ${betaTeam}</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                targetGrid.insertAdjacentHTML('beforeend', cardHtml);
+            });
+
+            const modal = document.getElementById('event-popup-modal');
+            modal.classList.remove('invisible');
+            setTimeout(() => {
+                document.getElementById('event-popup-backdrop').classList.replace('opacity-0', 'opacity-100');
+                document.getElementById('event-popup-card').classList.remove('opacity-0', 'scale-95', 'translate-y-4');
+            }, 20);
+        }
+
+        function closeEventPopup() {
+            const modal = document.getElementById('event-popup-modal');
+            document.getElementById('event-popup-backdrop').classList.replace('opacity-100', 'opacity-0');
+            document.getElementById('event-popup-card').classList.add('opacity-0', 'scale-95', 'translate-y-4');
+            setTimeout(() => modal.classList.add('invisible'), 300);
+        }
+
+        // COMPOUND ROSTER SEARCH CONTROLLER (TIER RANK & SEARCH STRING LOOKUP ARRAY MATCHING)
+        function executeRosterSearch() {
+            const searchStr = document.getElementById('player-matrix-search').value.toLowerCase().trim();
+            const nodes = document.querySelectorAll('.player-node');
+            let matchCount = 0;
+
+            nodes.forEach(node => {
+                const nodeTier = node.getAttribute('data-skill');
+                const name = node.querySelector('.node-name').innerText.toLowerCase();
+                const team = node.querySelector('.node-team').innerText.toLowerCase();
+                
+                const matchesTier = (currentActiveTierFilter === 'All' || nodeTier === currentActiveTierFilter);
+                const matchesString = (!searchStr || name.includes(searchStr) || team.includes(searchStr));
+
+                if (matchesTier && matchesString) {
+                    node.style.display = 'flex';
+                    matchCount++;
+                } else {
+                    node.style.display = 'none';
+                }
+            });
+
+            const fallback = document.getElementById('search-fallback-empty');
+            if (matchCount === 0) {
+                fallback.classList.remove('hidden');
+            } else {
+                fallback.classList.add('hidden');
+            }
+        }
+
+        function filterPlayerRoster(tier, buttonElement) {
+            currentActiveTierFilter = tier;
+            document.querySelectorAll('.filter-badge-btn').forEach(btn => {
+                btn.className = "filter-badge-btn px-2.5 py-1 text-[10px] font-bold tracking-wide rounded-lg transition-all duration-200 text-slate-400 hover:text-slate-200 hover:bg-slate-900/40";
+            });
+            buttonElement.className = "filter-badge-btn px-2.5 py-1 text-[10px] font-bold tracking-wide rounded-lg transition-all duration-200 bg-slate-900 border border-slate-800 text-emerald-400";
+            
+            executeRosterSearch();
+        }
+
+        // PROFILE INPUT DIALOG SUBMISSION MATRICES
+        function openEnrollModal() {
+            // Force dynamic layout framework to show the roster frame when clicking enroll actions
+            activateSectionView('roster');
+
+            document.getElementById('modal-title').innerText = "Enroll Ecosystem Member";
+            document.getElementById('modal-desc').innerText = "Inject player arrays directly into the system database runtime structure.";
+            document.getElementById('modal-submit-btn').innerText = "Write Node Entry";
+            document.getElementById('edit-node-id').value = "";
+            showModalWrapper();
+        }
+
+        function openEditModal(nodeId) {
+            const targetNode = document.getElementById(nodeId);
+            const currentName = targetNode.querySelector('.node-name').innerText;
+            const rawTeam = targetNode.querySelector('.node-team').innerText;
+            const currentSkill = targetNode.getAttribute('data-skill');
+
+            document.getElementById('modal-title').innerText = "Modify Profile Matrix";
+            document.getElementById('modal-desc').innerText = "Alter data nodes stored inside the array runtime.";
+            document.getElementById('modal-submit-btn').innerText = "Apply Delta Updates";
+            
+            document.getElementById('edit-node-id').value = nodeId;
+            document.getElementById('player-name').value = currentName;
+            document.getElementById('player-team').value = rawTeam === 'N/A' ? '' : rawTeam;
+            document.getElementById('player-skill').value = currentSkill;
+
+            showModalWrapper();
+        }
+
+        function showModalWrapper() {
+            const modal = document.getElementById('enroll-modal');
+            modal.classList.remove('invisible');
+            modal.classList.add('pointer-events-auto');
+            setTimeout(() => {
+                document.getElementById('enroll-backdrop').classList.replace('opacity-0', 'opacity-100');
+                document.getElementById('enroll-card').classList.remove('opacity-0', 'scale-95', 'translate-y-4');
+                document.getElementById('player-name').focus();
+            }, 20);
+        }
+
+        function closeEnrollModal() {
+            const modal = document.getElementById('enroll-modal');
+            document.getElementById('enroll-backdrop').classList.replace('opacity-100', 'opacity-0');
+            document.getElementById('enroll-card').classList.add('opacity-0', 'scale-95', 'translate-y-4');
+            modal.classList.remove('pointer-events-auto');
+            setTimeout(() => {
+                modal.classList.add('invisible');
+                document.getElementById('enroll-form').reset();
+            }, 300);
+        }
+
+        function getThemes(skill) {
+            let skillTheme = "bg-emerald-500/10 border-emerald-500/20 text-emerald-400";
+            let avatarTheme = "from-amber-500 to-emerald-500";
+            if(skill === "Beginner") { skillTheme = "bg-cyan-500/10 border-cyan-500/20 text-cyan-400"; avatarTheme="from-cyan-500 to-indigo-500"; }
+            if(skill === "Advanced") { skillTheme = "bg-amber-500/10 border-amber-500/20 text-amber-400"; avatarTheme="from-amber-500 to-emerald-500"; }
+            if(skill === "Elite") { skillTheme = "bg-rose-500/10 border-rose-500/20 text-rose-400"; avatarTheme="from-rose-500 to-amber-500"; }
+            return { skillTheme, avatarTheme };
+        }
+
+        function handleFormSubmission(event) {
+            event.preventDefault();
+            const name = document.getElementById('player-name').value.trim();
+            const rawTeam = document.getElementById('player-team').value.trim();
+            const skill = document.getElementById('player-skill').value;
+            const targetId = document.getElementById('edit-node-id').value;
+            
+            if(!name) return;
+            const teamDisplay = rawTeam ? `<span class="node-team text-slate-300 font-medium bg-slate-950/60 px-1.5 py-0.5 rounded border border-slate-800">${rawTeam}</span>` : `<span class="node-team text-slate-400 font-medium">N/A</span>`;
+            const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0,2);
+            const { skillTheme, avatarTheme } = getThemes(skill);
+
+            if (targetId) {
+                const node = document.getElementById(targetId);
+                node.setAttribute('data-skill', skill);
+                node.querySelector('.node-avatar').innerText = initials;
+                node.querySelector('.node-avatar').className = `node-avatar w-9 h-9 rounded-xl bg-gradient-to-tr ${avatarTheme} p-px flex items-center justify-center flex-shrink-0 font-bold text-xs text-slate-200 shadow-lg`;
+                node.querySelector('.node-name').innerText = name;
+                node.querySelector('.node-team').parentElement.innerHTML = `Team: ${teamDisplay}`;
+                
+                const badge = node.querySelector('.node-badge');
+                badge.innerText = skill;
+                badge.className = `node-badge px-1.5 py-0.5 ${skillTheme} rounded-md text-[8px] font-bold uppercase tracking-wider`;
+                
+                showToast('success', 'Profile Updated', `${name}'s metrics saved successfully.`);
+            } else {
+                const generatedId = 'player-node-' + Date.now();
+                const cardHtml = `
+                    <div id="${generatedId}" data-skill="${skill}" class="player-node bg-slate-900/20 border border-slate-800/80 backdrop-blur-2xl rounded-xl p-3.5 shadow-xl transition-all duration-500 opacity-0 scale-90 translate-y-4 group flex flex-col justify-between gap-3">
+                        <div class="flex items-start justify-between gap-3 min-w-0 w-full">
+                            <div class="flex items-center gap-3 min-w-0">
+                                <div class="node-avatar w-9 h-9 rounded-xl bg-gradient-to-tr ${avatarTheme} p-px flex items-center justify-center flex-shrink-0 font-bold text-xs text-slate-200 shadow-lg">${initials}</div>
+                                <div class="truncate">
+                                    <h3 class="node-name text-xs font-bold text-slate-200 truncate group-hover:text-emerald-400 transition-colors">${name}</h3>
+                                    <p class="text-[10px] font-semibold text-slate-500 mt-0.5 flex items-center gap-1">Team: ${teamDisplay}</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-1 flex-shrink-0">
+                                <button onclick="openEditModal('${generatedId}')" class="text-slate-500 hover:text-cyan-400 transition-colors p-1" title="Edit Profile"><i class="fa-solid fa-pen-to-square text-[10px]"></i></button>
+                                <span class="node-badge px-1.5 py-0.5 ${skillTheme} rounded-md text-[8px] font-bold uppercase tracking-wider">${skill}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                const wrapper = document.getElementById('players-grid-wrapper');
+                wrapper.insertAdjacentHTML('afterbegin', cardHtml);
+                
+                setTimeout(() => {
+                    wrapper.firstElementChild.classList.remove('opacity-0', 'scale-90', 'translate-y-4');
+                    document.getElementById('sidebar-counter-player').innerText = String(document.querySelectorAll('#players-grid-wrapper > .player-node').length).padStart(2, '0');
+                }, 50);
+                showToast('success', 'Roster Node Added', `${name} introduced into database.`);
+            }
+            
+            executeRosterSearch();
+            closeEnrollModal();
+        }
+
+        function showToast(type, title, description) {
+            const container = document.getElementById('toast-container');
+            const id = 'toast-' + Date.now();
+            const borderAccent = type === 'error' ? 'border-rose-500' : 'border-emerald-400';
+            const icon = type === 'error' ? 'fa-triangle-exclamation text-rose-500' : 'fa-circle-check text-emerald-400';
+
+            const html = `
+                <div id="${id}" class="transition-all duration-300 ease-out opacity-0 scale-95 translate-y-4 pointer-events-auto flex items-start gap-3 bg-slate-900/95 backdrop-blur-xl border-l-2 ${borderAccent} p-3 rounded-xl shadow-2xl border border-slate-800 w-full text-left">
+                    <i class="fa-solid ${icon} mt-0.5 text-xs flex-shrink-0"></i>
+                    <div>
+                        <h4 class="text-xs font-bold text-slate-200 tracking-wide">${title}</h4>
+                        <p class="text-[10px] text-slate-400 mt-0.5 leading-normal font-medium">${description}</p>
+                    </div>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', html);
+            setTimeout(() => document.getElementById(id)?.classList.remove('opacity-0', 'scale-95', 'translate-y-4'), 20);
+            setTimeout(() => {
+                const el = document.getElementById(id);
+                if(el) { el.classList.add('opacity-0', 'translate-y-2'); setTimeout(() => el.remove(), 400); }
+            }, 3500);
+        }
+    </script>
+</body>
+</html>
