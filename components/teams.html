@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmashMatch - Admin Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght=300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body { font-family: 'Poppins', sans-serif; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.6); border-radius: 8px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(51, 65, 85, 0.8); border-radius: 8px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(71, 85, 105, 1); }
+    </style>
+</head>
+<body class="bg-slate-900 text-white min-h-screen flex flex-col justify-between antialiased selection:bg-emerald-500 selection:text-slate-900 relative transition-opacity duration-700 ease-in-out" id="body-overlay">
+
+    <div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0 opacity-10">
+        <div class="absolute -top-40 left-10 w-96 h-96 bg-emerald-500 rounded-full filter blur-3xl"></div>
+        <div class="absolute bottom-10 right-10 w-96 h-96 bg-cyan-500 rounded-full filter blur-3xl"></div>
+    </div>
+
+    <header class="w-full border-b border-slate-800/80 bg-slate-950/40 backdrop-blur-md z-10 px-4 py-4">
+        <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
+            
+            <div class="flex items-center gap-4">
+                <button onclick="navigateBack()" class="flex items-center justify-center gap-2 bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 text-slate-300 hover:text-white px-3 py-1.5 rounded-xl text-xs transition-all font-medium active:scale-95">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span class="hidden sm:inline">Back</span>
+                </button>
+                <div class="flex items-center gap-2">
+                    <div class="w-9 h-9 bg-gradient-to-tr from-emerald-500 to-cyan-400 rounded-xl flex items-center justify-center shadow-md">
+                        <i class="fa-solid fa-shuttlecock text-slate-950 text-lg"></i>
+                    </div>
+                    <span class="text-xl font-bold tracking-tight bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent hidden xs:inline">SmashMatch</span>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <span class="text-xs text-slate-400 bg-slate-800/40 border border-slate-700/40 px-3 py-1.5 rounded-full hidden md:flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span> Admin Console
+                </span>
+                <button onclick="showLogoutModal()" class="flex items-center justify-center gap-2 border border-rose-500/30 hover:border-rose-500 bg-rose-500/5 hover:bg-rose-500 text-rose-400 hover:text-slate-950 px-4 py-1.5 rounded-xl text-xs font-semibold transition-all shadow-md active:scale-95">
+                    <i class="fa-solid fa-right-from-bracket text-xs"></i>
+                    <span>Logout</span>
+                </button>
+            </div>
+
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-7xl w-full mx-auto p-4 md:p-6 lg:p-8 z-10 grid grid-cols-1 lg:grid-cols-12 gap-8">
+        
+        <section class="lg:col-span-5 space-y-6">
+            <div class="mb-2">
+                <h2 class="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
+                    Configuration Deck
+                </h2>
+                <p class="text-slate-400 text-sm mt-1">Register teams and assemble individual player profiles with distinctive rank attributes.</p>
+            </div>
+
+            <div class="bg-slate-800/80 border border-slate-700/50 rounded-2xl p-6 shadow-xl backdrop-blur-xl">
+                <h3 class="text-sm font-semibold uppercase tracking-wider text-slate-400 mb-5"><i class="fa-solid fa-plus-circle text-emerald-400 mr-2"></i>Create New Team</h3>
+                
+                <div class="space-y-5">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Team Name</label>
+                        <input type="text" id="team-name" class="w-full bg-slate-900/60 border border-slate-700 rounded-xl py-3 px-4 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all text-sm" placeholder="e.g., Smasher Knights">
+                    </div>
+                    
+                    <div class="border-t border-slate-700/50 my-2 pt-4">
+                        <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Roster Builder (Add Individual Players)</label>
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-center">
+                            <div class="sm:col-span-6">
+                                <input type="text" id="player-name" class="w-full bg-slate-900/60 border border-slate-700 rounded-xl py-2.5 px-4 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition-all text-sm" placeholder="Player Name">
+                            </div>
+                            <div class="sm:col-span-4">
+                                <select id="player-rank" class="w-full bg-slate-900/60 border border-slate-700 rounded-xl py-2.5 px-3 text-slate-300 focus:outline-none focus:border-emerald-500 transition-all text-sm cursor-pointer">
+                                    <option value="Beginner">Beginner</option>
+                                    <option value="Intermediate" selected>Intermediate</option>
+                                    <option value="Advanced">Advanced</option>
+                                </select>
+                            </div>
+                            <div class="sm:col-span-2">
+                                <button type="button" onclick="stagePlayer()" class="w-full bg-slate-700/80 hover:bg-slate-700 border border-slate-600 text-white font-medium rounded-xl py-2.5 transition-all text-sm flex items-center justify-center shadow-sm" title="Add Player to List">
+                                    <i class="fa-solid fa-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="staged-players-wrapper" class="hidden bg-slate-900/30 rounded-xl p-3 border border-slate-700/30">
+                        <p class="text-[11px] text-slate-500 uppercase tracking-wider font-semibold mb-2">Players Drafted into Current Team Stack:</p>
+                        <div id="staged-players-list" class="flex flex-wrap gap-2"></div>
+                    </div>
+
+                    <button onclick="commitFullTeam()" class="w-full mt-2 bg-slate-900 hover:bg-slate-750 text-emerald-400 border border-emerald-500/30 hover:border-emerald-500/60 font-medium rounded-xl py-3 transition-all flex items-center justify-center gap-2 text-sm shadow-inner">
+                        <i class="fa-solid fa-square-plus text-xs"></i>
+                        <span>Add Full Team</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <button onclick="clearAllTeams()" class="w-1/3 bg-slate-800 border border-slate-700 text-slate-400 hover:text-white hover:bg-slate-750 font-medium rounded-xl py-3.5 transition-all text-sm flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-trash-can text-xs"></i> Wipe Drafts
+                </button>
+                
+                <button onclick="launchMatchmaking(this)" id="submit-roster-btn" class="w-2/3 bg-gradient-to-r from-emerald-500 to-cyan-500 text-slate-950 font-semibold rounded-xl py-3.5 shadow-lg shadow-emerald-500/20 hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+                    <span>Generate Matches & Open View</span>
+                    <i class="fa-solid fa-play text-xs"></i>
+                </button>
+            </div>
+        </section>
+
+        <section class="lg:col-span-7 flex flex-col space-y-4">
+            <div class="flex justify-between items-end">
+                <div>
+                    <h3 class="text-sm font-semibold uppercase tracking-wider text-slate-400 flex items-center">
+                        <i class="fa-solid fa-clipboard-list text-cyan-400 mr-2"></i>Live Tournament Database
+                    </h3>
+                    <p class="text-xs text-slate-500 mt-0.5">Real-time breakdown of registered league clubs.</p>
+                </div>
+                <span id="team-counter" class="text-xs font-semibold bg-slate-950 border border-slate-800 px-3 py-1 rounded-full text-cyan-400">
+                    0 Teams Registered
+                </span>
+            </div>
+
+            <div class="grid grid-cols-3 gap-3 bg-slate-950/40 border border-slate-800 rounded-xl p-3 text-center">
+                <div>
+                    <div class="text-[10px] uppercase font-semibold text-amber-500 tracking-wider">Beginners</div>
+                    <div id="count-beg" class="text-lg font-bold text-slate-200 mt-0.5">0</div>
+                </div>
+                <div class="border-x border-slate-800">
+                    <div class="text-[10px] uppercase font-semibold text-emerald-400 tracking-wider">Intermediates</div>
+                    <div id="count-int" class="text-lg font-bold text-slate-200 mt-0.5">0</div>
+                </div>
+                <div>
+                    <div class="text-[10px] uppercase font-semibold text-cyan-400 tracking-wider">Advanced</div>
+                    <div id="count-adv" class="text-lg font-bold text-slate-200 mt-0.5">0</div>
+                </div>
+            </div>
+
+            <div id="preview-list" class="flex-grow bg-slate-800/40 border border-slate-800 rounded-2xl p-4 min-h-[380px] lg:h-[450px] overflow-y-auto space-y-3 custom-scrollbar">
+                
+                <div id="empty-state" class="h-full flex flex-col items-center justify-center text-center p-6">
+                    <div class="w-14 h-14 bg-slate-900 border border-slate-800 rounded-full flex items-center justify-center text-slate-600 mb-3 shadow-inner">
+                        <i class="fa-solid fa-users text-xl"></i>
+                    </div>
+                    <h4 class="text-slate-400 text-sm font-medium"> Roster Database Clear</h4>
+                    <p class="text-slate-600 text-xs max-w-[260px] mt-1">Configure and add teams from the control deck to dynamically construct your matchmaking index.</p>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <div id="custom-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-slate-950/60 backdrop-blur-sm transition-opacity" onclick="hideModal()"></div>
+        
+        <div class="bg-slate-800 border border-slate-700 text-white rounded-2xl max-w-sm w-full p-6 shadow-2xl relative z-10 transform scale-95 opacity-0 transition-all duration-300 ease-out" id="modal-card">
+            <div id="modal-icon-container" class="w-12 h-12 rounded-full flex items-center justify-center text-xl mb-4 mx-auto">
+                <i id="modal-icon" class="fa-solid"></i>
+            </div>
+            <h3 id="modal-title" class="text-lg font-bold text-center text-white tracking-tight"></h3>
+            <p id="modal-desc" class="text-slate-400 text-sm text-center mt-2"></p>
+            
+            <div id="modal-actions" class="flex items-center gap-3 mt-6"></div>
+        </div>
+    </div>
+
+    <footer class="w-full text-center p-4 border-t border-slate-800/60 bg-slate-950/20 backdrop-blur-md text-xs text-slate-500 z-10">
+        SmashMatch Badminton Matchmaking Engine
+    </footer>
+
+    <script>
+        let tournamentData = [
+            { 
+                id: 1, 
+                name: "Apex Shuttle Overlords", 
+                players: [{ name: "Marcus Chen", rank: "Advanced" }, { name: "Sarah Tan", rank: "Intermediate" }, { name: "Coach Derrick", rank: "Advanced" }] 
+            },
+            { 
+                id: 2, 
+                name: "Net Rushers Club", 
+                players: [{ name: "Emily Watson", rank: "Beginner" }, { name: "David Kim", rank: "Intermediate" }] 
+            }
+        ];
+
+        let activeFormRoster = [];
+
+        window.addEventListener('DOMContentLoaded', () => {
+            refreshPreviewUI();
+        });
+
+        // Navigation Header Buttons Functions
+        function navigateBack() {
+            document.getElementById('body-overlay').classList.add('opacity-0');
+            setTimeout(() => {
+                window.location.href = 'clubs.html'; 
+            }, 700);
+        }
+
+        // Custom Modal UI Engine Orchestration
+        function showCustomModal({ title, desc, icon, iconTheme, actions }) {
+            const modal = document.getElementById('custom-modal');
+            const card = document.getElementById('modal-card');
+            const titleEl = document.getElementById('modal-title');
+            const descEl = document.getElementById('modal-desc');
+            const iconEl = document.getElementById('modal-icon');
+            const iconContainer = document.getElementById('modal-icon-container');
+            const actionsContainer = document.getElementById('modal-actions');
+
+            titleEl.innerText = title;
+            descEl.innerText = desc;
+            
+            iconEl.className = `fa-solid ${icon}`;
+            iconContainer.className = `w-12 h-12 rounded-full flex items-center justify-center text-xl mb-4 mx-auto ${iconTheme}`;
+            
+            actionsContainer.innerHTML = actions.map((act, index) => `
+                <button onclick="${act.action}" class="w-full text-sm font-medium rounded-xl py-2.5 transition-all ${act.style}">
+                    ${act.text}
+                </button>
+            `).join('');
+
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                card.classList.remove('scale-95', 'opacity-0');
+                card.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        }
+
+        function hideModal() {
+            const card = document.getElementById('modal-card');
+            const modal = document.getElementById('custom-modal');
+            
+            card.classList.remove('scale-100', 'opacity-100');
+            card.classList.add('scale-95', 'opacity-0');
+            
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
+        // Logout Processing Modal
+        function showLogoutModal() {
+            showCustomModal({
+                title: 'Sign Out Confirmation',
+                desc: 'Are you sure you want to log out of the administration console? Uncommitted bracket modifications may be lost.',
+                icon: 'fa-right-from-bracket',
+                iconTheme: 'bg-rose-500/10 border border-rose-500/20 text-rose-400',
+                actions: [
+                    { text: 'Cancel', action: 'hideModal()', style: 'bg-slate-700 hover:bg-slate-650 border border-slate-600 text-slate-200' },
+                    { text: 'Logout', action: 'executeLogout()', style: 'bg-rose-500 hover:bg-rose-600 text-slate-950 font-semibold shadow-md shadow-rose-500/10' }
+                ]
+            });
+        }
+
+        function executeLogout() {
+            hideModal();
+            setTimeout(() => {
+                document.getElementById('body-overlay').classList.add('opacity-0');
+                setTimeout(() => {
+                    window.location.href = 'index.html'; 
+                }, 700);
+            }, 200);
+        }
+
+        // Add Player logic block
+        function stagePlayer() {
+            const nameInput = document.getElementById('player-name');
+            const rankSelect = document.getElementById('player-rank');
+            
+            const nameValue = nameInput.value.trim();
+            const rankValue = rankSelect.value;
+
+            if (!nameValue) {
+                showCustomModal({
+                    title: 'Invalid Metadata',
+                    desc: 'Please input a valid player identity name string before attempting drafting procedures.',
+                    icon: 'fa-circle-exclamation',
+                    iconTheme: 'bg-amber-500/10 border border-amber-500/20 text-amber-400',
+                    actions: [{ text: 'Acknowledge', action: 'hideModal()', style: 'bg-slate-700 hover:bg-slate-600 text-white' }]
+                });
+                return;
+            }
+
+            activeFormRoster.push({ name: nameValue, rank: rankValue });
+
+            nameInput.value = "";
+            nameInput.focus();
+
+            updateStagedFormUI();
+        }
+
+        // Monitors individual form item stack displays
+        function updateStagedFormUI() {
+            const wrapper = document.getElementById('staged-players-wrapper');
+            const listContainer = document.getElementById('staged-players-list');
+            
+            listContainer.innerHTML = "";
+
+            if (activeFormRoster.length === 0) {
+                wrapper.classList.add('hidden');
+                return;
+            }
+
+            wrapper.classList.remove('hidden');
+
+            activeFormRoster.forEach((player, index) => {
+                const tag = document.createElement('span');
+                tag.className = `inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-lg border shadow-sm ${getRankStyle(player.rank)}`;
+                tag.innerHTML = `
+                    <span>${player.name}</span>
+                    <button type="button" onclick="removeStagedPlayer(${index})" class="text-slate-400 hover:text-white ml-1 font-bold cursor-pointer">×</button>
+                `;
+                listContainer.appendChild(tag);
+            });
+        }
+
+        function removeStagedPlayer(index) {
+            activeFormRoster.splice(index, 1);
+            updateStagedFormUI();
+        }
+
+        // Add Full Team processing functional loop
+        function commitFullTeam() {
+            const teamNameInput = document.getElementById('team-name');
+            const teamName = teamNameInput.value.trim();
+
+            if (!teamName) {
+                showCustomModal({
+                    title: 'Missing Context',
+                    desc: 'Please assign a structural Team Name label before committing database data records.',
+                    icon: 'fa-folder-open',
+                    iconTheme: 'bg-amber-500/10 border border-amber-500/20 text-amber-400',
+                    actions: [{ text: 'Go Back', action: 'hideModal()', style: 'bg-slate-700 hover:bg-slate-600 text-white' }]
+                });
+                return;
+            }
+
+            if (activeFormRoster.length === 0) {
+                showCustomModal({
+                    title: 'Empty Squad Stack',
+                    desc: 'No players have been compiled yet. Add configuration records using the profile adder section before assigning this team layout.',
+                    icon: 'fa-user-slash',
+                    iconTheme: 'bg-amber-500/10 border border-amber-500/20 text-amber-400',
+                    actions: [{ text: 'Understand', action: 'hideModal()', style: 'bg-slate-700 hover:bg-slate-600 text-white' }]
+                });
+                return;
+            }
+
+            tournamentData.push({
+                id: Date.now(),
+                name: teamName,
+                players: [...activeFormRoster]
+            });
+
+            teamNameInput.value = "";
+            activeFormRoster = [];
+            
+            updateStagedFormUI();
+            refreshPreviewUI();
+        }
+
+        // Trigger Mid-Screen Delete Confirmation Modal 
+        function deleteTeam(id) {
+            const teamToDelete = tournamentData.find(team => team.id === id);
+            const teamName = teamToDelete ? teamToDelete.name : 'this team';
+
+            showCustomModal({
+                title: 'Delete Team Registration',
+                desc: `Are you sure you want to permanently remove "${teamName}" from the database layout? This action cannot be undone.`,
+                icon: 'fa-trash-can',
+                iconTheme: 'bg-rose-500/10 border border-rose-500/20 text-rose-400',
+                actions: [
+                    { text: 'Cancel', action: 'hideModal()', style: 'bg-slate-700 hover:bg-slate-650 border border-slate-600 text-slate-200' },
+                    { text: 'Confirm Delete', action: `executeDeleteTeam(${id})`, style: 'bg-rose-500 hover:bg-rose-600 text-slate-950 font-semibold shadow-md shadow-rose-500/10' }
+                ]
+            });
+        }
+
+        function executeDeleteTeam(id) {
+            tournamentData = tournamentData.filter(team => team.id !== id);
+            hideModal();
+            refreshPreviewUI();
+        }
+
+        // Clear all teams confirmation modal wrapper
+        function clearAllTeams() {
+            if (tournamentData.length === 0) return;
+            
+            showCustomModal({
+                title: 'Wipe Entire Database',
+                desc: 'Are you absolutely sure you want to wipe all registered teams? This will entirely clear your current tournament configuration draft entries.',
+                icon: 'fa-triangle-exclamation',
+                iconTheme: 'bg-rose-500/10 border border-rose-500/20 text-rose-400',
+                actions: [
+                    { text: 'Cancel', action: 'hideModal()', style: 'bg-slate-700 hover:bg-slate-650 border border-slate-600 text-slate-200' },
+                    { text: 'Wipe All Data', action: 'executeClearAllTeams()', style: 'bg-rose-500 hover:bg-rose-600 text-slate-950 font-semibold shadow-md shadow-rose-500/10' }
+                ]
+            });
+        }
+
+        function executeClearAllTeams() {
+            tournamentData = [];
+            hideModal();
+            refreshPreviewUI();
+        }
+
+        // Badge color engine parser
+        function getRankStyle(rank) {
+            switch(rank) {
+                case 'Advanced': return 'bg-cyan-500/10 border-cyan-500/20 text-cyan-400';
+                case 'Intermediate': return 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400';
+                case 'Beginner': return 'bg-amber-500/10 border-amber-500/20 text-amber-400';
+                default: return 'bg-slate-700/40 border-slate-600/40 text-slate-300';
+            }
+        }
+
+        // Preview Layout Engine
+        function refreshPreviewUI() {
+            const previewList = document.getElementById('preview-list');
+            const emptyState = document.getElementById('empty-state');
+            const counter = document.getElementById('team-counter');
+
+            const begEl = document.getElementById('count-beg');
+            const intEl = document.getElementById('count-int');
+            const advEl = document.getElementById('count-adv');
+
+            counter.innerText = tournamentData.length === 1 ? "1 Team Registered" : `${tournamentData.length} Teams Registered`;
+
+            const activeCards = previewList.querySelectorAll('.staged-team-card');
+            activeCards.forEach(card => card.remove());
+
+            if (tournamentData.length === 0) {
+                emptyState.classList.remove('hidden');
+                begEl.innerText = "0"; intEl.innerText = "0"; advEl.innerText = "0";
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+
+            let totals = { Beginner: 0, Intermediate: 0, Advanced: 0 };
+
+            tournamentData.forEach((team) => {
+                const card = document.createElement('div');
+                card.className = "staged-team-card bg-slate-900/80 border border-slate-800/80 rounded-2xl overflow-hidden shadow-lg transition-all hover:border-slate-700/80 group";
+                
+                const playerRowsHTML = team.players.map(p => {
+                    totals[p.rank] = (totals[p.rank] || 0) + 1;
+                    return `
+                        <div class="flex items-center justify-between bg-slate-950/40 border border-slate-800/40 rounded-xl px-3 py-2 text-xs">
+                            <div class="flex items-center gap-2">
+                                <div class="w-5 h-5 bg-slate-800 rounded-full flex items-center justify-center text-[10px] text-slate-400 font-medium">
+                                    ${p.name.charAt(0).toUpperCase()}
+                                </div>
+                                <span class="text-slate-200 font-medium truncate max-w-[140px]">${p.name}</span>
+                            </div>
+                            <span class="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded border ${getRankStyle(p.rank)}">${p.rank}</span>
+                        </div>
+                    `;
+                }).join('');
+
+                card.innerHTML = `
+                    <div class="bg-slate-950/60 border-b border-slate-800/60 px-4 py-3 flex items-center justify-between gap-3">
+                        <div class="flex items-center gap-2.5 overflow-hidden">
+                            <div class="w-8 h-8 bg-gradient-to-tr from-slate-800 to-slate-700 border border-slate-700/60 rounded-lg flex items-center justify-center text-slate-300 shadow-sm flex-shrink-0">
+                                <i class="fa-solid fa-shield-halved text-xs text-cyan-400"></i>
+                            </div>
+                            <div class="overflow-hidden">
+                                <h4 class="text-sm font-semibold text-white tracking-tight truncate">${team.name}</h4>
+                                <p class="text-[10px] text-slate-500 font-medium uppercase tracking-wider mt-0.5">${team.players.length} Competitors</p>
+                            </div>
+                        </div>
+                        <button onclick="deleteTeam(${team.id})" class="text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 w-7 h-7 rounded-lg transition-all flex items-center justify-center flex-shrink-0" title="Delete Team Block">
+                            <i class="fa-solid fa-trash text-xs"></i>
+                        </button>
+                    </div>
+                    <div class="p-3.5 bg-slate-900/40 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        ${playerRowsHTML}
+                    </div>
+                `;
+                previewList.appendChild(card);
+            });
+
+            begEl.innerText = totals.Beginner;
+            intEl.innerText = totals.Intermediate;
+            advEl.innerText = totals.Advanced;
+        }
+
+        // Matchmaking compiler engine router
+        function launchMatchmaking(btnElement) {
+            if (tournamentData.length < 2) {
+                showCustomModal({
+                    title: 'Insufficent Metrics',
+                    desc: 'Please establish a valid layout containing at least 2 complete teams before compiling matchmaking matrices.',
+                    icon: 'fa-network-wired',
+                    iconTheme: 'bg-amber-500/10 border border-amber-500/20 text-amber-400',
+                    actions: [{ text: 'Close', action: 'hideModal()', style: 'bg-slate-700 hover:bg-slate-600 text-white' }]
+                });
+                return;
+            }
+
+            btnElement.disabled = true;
+            btnElement.innerHTML = `
+                <span>Compiling Matrix Data</span>
+                <i class="fa-solid fa-circle-notch text-xs animate-spin"></i>
+            `;
+
+            setTimeout(() => {
+                const bodyOverlay = document.getElementById('body-overlay');
+                bodyOverlay.classList.add('opacity-0');
+
+                setTimeout(() => {
+                    window.location.href = 'matches.html'; // Target updated to matches.html
+                }, 700);
+            }, 1400);
+        }
+    </script>
+</body>
+</html>

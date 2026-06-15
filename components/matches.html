@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmashMatch - Arena Pro Control</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for Premium Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .custom-scrollbar::-webkit-scrollbar { width: 5px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: rgba(8, 10, 21, 0.6); }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(63, 63, 70, 0.7); border-radius: 99px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(161, 161, 170, 0.9); }
+        .glass-panel { background: rgba(15, 18, 36, 0.7); border: 1px solid rgba(255, 255, 255, 0.06); backdrop-filter: blur(20px); }
+        .glow-cyan:hover { box-shadow: 0 0 25px rgba(6, 182, 212, 0.25); }
+        
+        /* Custom Fine-Tuned Animation Core Keyframes */
+        @keyframes fadeInScale {
+            0% { opacity: 0; transform: scale(0.92) translateY(10px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .animate-fade-in-scale {
+            animation: fadeInScale 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        /* Dynamic Expandable Row Transitions */
+        .expand-transition {
+            display: grid;
+            grid-template-rows: 0fr;
+            transition: grid-template-rows 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s linear;
+            opacity: 0;
+        }
+        .expand-transition.expanded {
+            grid-template-rows: 1fr;
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="bg-[#070913] text-zinc-100 min-h-screen flex flex-col justify-between antialiased selection:bg-fuchsia-500 selection:text-white relative transition-opacity duration-700 ease-in-out" id="body-overlay">
+
+    <!-- High-Fidelity Ambient Cyber-Glows -->
+    <div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0 opacity-20">
+        <div class="absolute -top-40 right-1/4 w-[250px] h-[250px] sm:w-[500px] sm:h-[500px] bg-gradient-to-tr from-fuchsia-600 to-cyan-500 rounded-full filter blur-[80px] sm:blur-[140px] animate-pulse duration-[8s]"></div>
+        <div class="absolute top-1/3 -left-40 w-[200px] h-[200px] sm:w-[400px] sm:h-[400px] bg-cyan-600 rounded-full filter blur-[70px] sm:blur-[120px]"></div>
+    </div>
+
+    <!-- Header Navigation Bar -->
+    <header class="w-full border-b border-zinc-800/60 bg-[#080a15]/60 backdrop-blur-xl z-20 px-4 sm:px-6 py-4 sticky top-0">
+        <div class="max-w-7xl mx-auto flex flex-row items-center justify-between gap-2">
+            
+            <!-- Branding & Control Nodes -->
+            <div class="flex items-center gap-3 sm:gap-5">
+                <button onclick="navigateBack()" class="flex items-center justify-center gap-1.5 bg-zinc-900/80 hover:bg-zinc-800 border border-zinc-800 text-zinc-400 hover:text-white px-2.5 py-2 sm:px-4 sm:py-2 rounded-xl text-[11px] sm:text-xs font-semibold tracking-wide transition-all active:scale-95">
+                    <i class="fa-solid fa-arrow-left-long"></i>
+                    <span class="hidden xs:inline">Control Deck</span>
+                </button>
+                <div class="h-5 w-px bg-zinc-800 hidden xs:block"></div>
+                <div class="flex items-center gap-2.5">
+                    <div class="w-9 h-9 sm:w-10 h-10 bg-gradient-to-br from-cyan-400 via-indigo-500 to-fuchsia-500 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/10 rotate-3">
+                        <i class="fa-solid fa-shuttlecock text-slate-950 text-base sm:text-xl -rotate-3"></i>
+                    </div>
+                    <div>
+                        <span class="text-base sm:text-lg font-extrabold tracking-tight bg-gradient-to-r from-white via-zinc-200 to-zinc-400 bg-clip-text text-transparent">SmashMatch</span>
+                        <span class="text-[9px] sm:text-[10px] font-bold text-cyan-400 block tracking-widest uppercase -mt-0.5 sm:-mt-1">Arena Studio</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Global Status Badge -->
+            <div class="flex items-center">
+                <span class="text-[10px] sm:text-xs font-bold text-zinc-300 bg-zinc-900/90 border border-zinc-800/80 px-2.5 py-1.5 sm:px-4 sm:py-2 rounded-xl flex items-center gap-1.5 sm:gap-2 shadow-inner">
+                    <span class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-cyan-400 shadow-[0_0_8px_#22d3ee] animate-ping"></span> <span class="hidden xxs:inline">Live Broadcast</span>
+                </span>
+            </div>
+
+        </div>
+    </header>
+
+    <!-- Main Workspace Framework -->
+    <main class="flex-grow max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 z-10 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
+        
+        <!-- Left Panel: Input Teams and Players Setup Area -->
+        <section class="lg:col-span-5 space-y-6">
+            <div>
+                <h2 class="text-xl sm:text-2xl font-extrabold tracking-tight text-white">
+                    Input Teams and Players
+                </h2>
+            </div>
+
+            <!-- Match Blueprint Card Form -->
+            <div class="glass-panel rounded-3xl p-4 sm:p-6 shadow-2xl relative overflow-hidden group border border-zinc-800/80">
+                <div class="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-cyan-500 via-indigo-500 to-fuchsia-500"></div>
+                
+                <h3 class="text-xs font-bold uppercase tracking-widest text-zinc-400 mb-4 sm:text-left flex items-center gap-2">
+                    <i class="fa-solid fa-sliders text-cyan-400"></i> Session Parameters
+                </h3>
+                
+                <div class="space-y-4">
+                    <!-- Match Type Option Segment (Singles / Doubles) -->
+                    <div>
+                        <label class="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-2">Match Format Style</label>
+                        <div class="grid grid-cols-2 gap-2 bg-zinc-950/80 border border-zinc-800 p-1 rounded-xl">
+                            <button id="format-singles" onclick="changeMatchFormat('Singles')" class="py-2 px-3 text-xs font-bold uppercase tracking-wide rounded-lg transition-all duration-300 bg-cyan-500 text-slate-950 shadow-md">
+                                <i class="fa-solid fa-user mr-1.5"></i>Singles
+                            </button>
+                            <button id="format-doubles" onclick="changeMatchFormat('Doubles')" class="py-2 px-3 text-xs font-bold uppercase tracking-wide rounded-lg transition-all duration-300 text-zinc-400 hover:text-white">
+                                <i class="fa-solid fa-user-group mr-1.5"></i>Doubles
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Config Top Options Grid -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <!-- Game Tag Label Field -->
+                        <div>
+                            <label class="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-2">Game Roster Index</label>
+                            <input type="text" id="game-label" class="w-full bg-zinc-950/60 border border-zinc-800 rounded-xl py-2.5 sm:py-3 px-4 text-white text-sm font-semibold tracking-wide placeholder-zinc-600 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all shadow-inner shadow-black/40" placeholder="e.g., Finals A">
+                        </div>
+                        <!-- Court Selection Numeric Field -->
+                        <div>
+                            <label class="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-2">Assign Court Number</label>
+                            <input type="number" id="court-selection" class="w-full bg-zinc-950/60 border border-zinc-800 rounded-xl py-2.5 sm:py-3 px-4 text-white text-sm font-semibold tracking-wide placeholder-zinc-600 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all shadow-inner shadow-black/40" placeholder="e.g., 1" value="1" min="1">
+                        </div>
+                    </div>
+                    
+                    <!-- Team Arena Layout Dropdown Matrix -->
+                    <div class="grid grid-cols-1 gap-4 border-t border-zinc-800/80 pt-4">
+                        
+                        <!-- Side A: Team 1 Container Box -->
+                        <div class="bg-zinc-950/40 border border-zinc-800/60 p-3.5 sm:p-4 rounded-2xl space-y-3 relative">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold text-cyan-400 uppercase tracking-widest flex items-center gap-1.5">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_6px_#22d3ee]"></span> Home Alliance
+                                </span>
+                                <span class="text-[9px] font-extrabold text-zinc-600 uppercase tracking-wider bg-zinc-900/80 px-2 py-0.5 rounded border border-zinc-800/40">Team 1</span>
+                            </div>
+                            <div class="space-y-3">
+                                <div>
+                                    <label class="block text-[9px] font-bold text-zinc-500 uppercase tracking-wider mb-1">Roster Club / Tag</label>
+                                    <select id="team-1-select" class="w-full bg-zinc-900/60 border border-zinc-800 rounded-xl py-2.5 px-3 text-xs text-zinc-200 font-medium focus:outline-none focus:border-cyan-500 transition-all"></select>
+                                </div>
+                                <div class="grid grid-cols-1 gap-3">
+                                    <div>
+                                        <label class="block text-[9px] font-bold text-zinc-500 uppercase tracking-wider mb-1">Primary Competitor</label>
+                                        <select id="player-1a-select" class="w-full bg-zinc-900/60 border border-zinc-800 rounded-xl py-2.5 px-3 text-xs text-zinc-200 font-medium focus:outline-none focus:border-cyan-500 transition-all"></select>
+                                    </div>
+                                    <!-- Dynamic Smooth Transition Grid Wrapper -->
+                                    <div id="wrapper-player-1b" class="expand-transition">
+                                        <div class="overflow-hidden">
+                                            <label class="block text-[9px] font-bold text-zinc-500 uppercase tracking-wider mb-1 pt-2">Partner Competitor</label>
+                                            <select id="player-1b-select" class="w-full bg-zinc-900/60 border border-zinc-800 rounded-xl py-2.5 px-3 text-xs text-zinc-200 font-medium focus:outline-none focus:border-cyan-500 transition-all"></select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- VS Divider Accent -->
+                        <div class="flex items-center justify-center -my-2 relative z-10">
+                            <span class="text-[10px] font-black tracking-widest bg-zinc-900 border-2 border-zinc-800 text-zinc-400 px-4 py-1 rounded-full italic shadow-lg shadow-black">VS</span>
+                        </div>
+
+                        <!-- Side B: Team 2 Container Box -->
+                        <div class="bg-zinc-950/40 border border-zinc-800/60 p-3.5 sm:p-4 rounded-2xl space-y-3 relative">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold text-fuchsia-400 uppercase tracking-widest flex items-center gap-1.5">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-fuchsia-400 shadow-[0_0_6px_#e879f9]"></span> Away Alliance
+                                </span>
+                                <span class="text-[9px] font-extrabold text-zinc-600 uppercase tracking-wider bg-zinc-900/80 px-2 py-0.5 rounded border border-zinc-800/40">Team 2</span>
+                            </div>
+                            <div class="space-y-3">
+                                <div>
+                                    <label class="block text-[9px] font-bold text-zinc-500 tracking-wider uppercase mb-1">Roster Club / Tag</label>
+                                    <select id="team-2-select" class="w-full bg-zinc-900/60 border border-zinc-800 rounded-xl py-2.5 px-3 text-xs text-zinc-200 font-medium focus:outline-none focus:border-fuchsia-500 transition-all"></select>
+                                </div>
+                                <div class="grid grid-cols-1 gap-3">
+                                    <div>
+                                        <label class="block text-[9px] font-bold text-zinc-500 tracking-wider uppercase mb-1">Primary Competitor</label>
+                                        <select id="player-2a-select" class="w-full bg-zinc-900/60 border border-zinc-800 rounded-xl py-2.5 px-3 text-xs text-zinc-200 font-medium focus:outline-none focus:border-fuchsia-500 transition-all"></select>
+                                    </div>
+                                    <!-- Dynamic Smooth Transition Grid Wrapper -->
+                                    <div id="wrapper-player-2b" class="expand-transition">
+                                        <div class="overflow-hidden">
+                                            <label class="block text-[9px] font-bold text-zinc-500 tracking-wider uppercase mb-1 pt-2">Partner Competitor</label>
+                                            <select id="player-2b-select" class="w-full bg-zinc-900/60 border border-zinc-800 rounded-xl py-2.5 px-3 text-xs text-zinc-200 font-medium focus:outline-none focus:border-fuchsia-500 transition-all"></select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Generate Card Control Trigger -->
+                    <button onclick="commitManualMatch()" class="w-full mt-2 bg-gradient-to-r from-cyan-400 via-indigo-500 to-fuchsia-500 text-white font-bold rounded-xl py-3.5 shadow-lg shadow-indigo-500/10 hover:opacity-95 active:scale-[0.99] transition-all flex items-center justify-center gap-2 text-xs uppercase tracking-widest">
+                        <i class="fa-solid fa-bolt-lightning text-xs"></i>
+                        <span>Inject Match Into Bracket</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Global Clear Controls -->
+            <button onclick="clearAllMatches()" class="w-full bg-zinc-900/40 border border-zinc-800/80 text-zinc-400 hover:text-rose-400 hover:bg-rose-950/20 hover:border-rose-900/60 font-semibold rounded-2xl py-3.5 transition-all text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-sm">
+                <i class="fa-solid fa-broom text-xs"></i> Purge Match Ledger
+            </button>
+        </section>
+
+        <!-- Right Panel: Live Matches Scoreboard -->
+        <section class="lg:col-span-7 flex flex-col space-y-4 h-full self-stretch">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                    <h3 class="text-sm font-bold uppercase tracking-widest text-zinc-400 flex items-center gap-2">
+                        <i class="fa-solid fa-tower-broadcast text-fuchsia-400"></i> Arena Scoreboard Matrix
+                    </h3>
+                    <p class="text-xs text-zinc-500 mt-0.5">Real-time breakdown. Click any match below to open its scoring system.</p>
+                </div>
+                <span id="match-counter" class="text-xs font-bold bg-zinc-950 border border-zinc-800 px-4 py-2 rounded-xl text-cyan-400 shadow-md self-start sm:self-auto transition-all duration-300">
+                    0 Matches Configured
+                </span>
+            </div>
+
+            <!-- Matrix Container Grid -->
+            <div id="match-list" class="flex-grow bg-[#090b17]/40 border border-zinc-800/60 rounded-3xl p-4 sm:p-5 min-h-[400px] lg:h-[580px] overflow-y-auto custom-scrollbar grid grid-cols-1 sm:grid-cols-2 gap-4 content-start backdrop-blur-sm transition-all duration-300">
+                
+                <!-- Fallback Empty State Block -->
+                <div id="empty-matches" class="col-span-full my-auto flex flex-col items-center justify-center text-center p-6 sm:p-8 transition-all duration-500">
+                    <div class="w-14 h-14 sm:w-16 sm:h-16 bg-zinc-900/60 border border-zinc-800/80 rounded-2xl flex items-center justify-center text-zinc-600 mb-4 shadow-inner relative">
+                        <div class="absolute inset-0 bg-cyan-500/5 filter blur-md rounded-2xl"></div>
+                        <i class="fa-solid fa-circle-nodes text-xl sm:text-2xl text-zinc-500 animate-pulse"></i>
+                    </div>
+                    <h4 class="text-zinc-300 text-sm font-bold tracking-wide">Scoreboard Ledger Empty</h4>
+                    <p class="text-zinc-500 text-xs max-w-[300px] mt-1.5 leading-relaxed">Map live court nodes using the configurator tool to initialize dynamic arena displays here.</p>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- SCOREBOARD SCORING PANEL MODAL SYSTEM -->
+    <div id="score-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 transition-all duration-300">
+        <div class="absolute inset-0 bg-zinc-950/80 backdrop-blur-md opacity-0 transition-opacity duration-300" id="score-modal-overlay" onclick="closeScoreModal()"></div>
+        <div class="bg-[#0b0e1e] border border-zinc-800/80 text-white rounded-3xl max-w-xl w-full overflow-hidden shadow-2xl relative z-10 transform scale-90 cubic-bezier(0.34, 1.56, 0.64, 1) opacity-0 transition-all duration-300" id="score-modal-card">
+            
+            <!-- Modal Header -->
+            <div class="bg-zinc-950/80 border-b border-zinc-900 p-4 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-trophy text-amber-400 text-sm"></i>
+                    <h3 id="score-modal-heading" class="text-xs font-black uppercase tracking-wider text-zinc-300">Match Score Room</h3>
+                </div>
+                <button onclick="closeScoreModal()" class="w-7 h-7 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-400 hover:text-white rounded-lg transition-colors flex items-center justify-center">
+                    <i class="fa-solid fa-xmark text-xs"></i>
+                </button>
+            </div>
+
+            <!-- Score Entry Layout Matrix -->
+            <div class="p-6 space-y-6">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 relative">
+                    
+                    <!-- Team 1 Score Box -->
+                    <div class="bg-zinc-950/60 border border-zinc-800/80 rounded-2xl p-4 flex flex-col justify-between space-y-4">
+                        <div>
+                            <span class="text-[10px] font-extrabold tracking-widest text-cyan-400 uppercase block mb-1">Home Alliance</span>
+                            <h4 id="score-t1-name" class="text-sm font-bold text-white truncate"></h4>
+                            <p id="score-p1-name" class="text-[11px] text-zinc-400 truncate mt-0.5 leading-snug min-h-[32px]"></p>
+                        </div>
+                        <div>
+                            <label class="block text-[9px] font-bold text-zinc-500 uppercase tracking-widest mb-1.5">Current Points</label>
+                            <input type="number" id="score-t1-pts" min="0" max="99" value="0" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl py-3 px-4 text-center text-2xl font-black text-cyan-400 focus:outline-none focus:border-cyan-500 transition-all shadow-inner">
+                        </div>
+                        <!-- Team 1 Individual Confirmation Toggle -->
+                        <button id="btn-confirm-t1" onclick="toggleTeamConfirmation(1)" class="w-full bg-zinc-900 border border-zinc-800 text-zinc-400 py-2.5 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all duration-300 flex items-center justify-center gap-2">
+                            <i class="fa-regular fa-circle"></i> <span>Confirm Home Score</span>
+                        </button>
+                    </div>
+
+                    <!-- Team 2 Score Box -->
+                    <div class="bg-zinc-950/60 border border-zinc-800/80 rounded-2xl p-4 flex flex-col justify-between space-y-4">
+                        <div>
+                            <span class="text-[10px] font-extrabold tracking-widest text-fuchsia-400 uppercase block mb-1">Away Alliance</span>
+                            <h4 id="score-t2-name" class="text-sm font-bold text-white truncate"></h4>
+                            <p id="score-p2-name" class="text-[11px] text-zinc-400 truncate mt-0.5 leading-snug min-h-[32px]"></p>
+                        </div>
+                        <div>
+                            <label class="block text-[9px] font-bold text-zinc-500 uppercase tracking-widest mb-1.5">Current Points</label>
+                            <input type="number" id="score-t2-pts" min="0" max="99" value="0" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl py-3 px-4 text-center text-2xl font-black text-fuchsia-400 focus:outline-none focus:border-fuchsia-500 transition-all shadow-inner">
+                        </div>
+                        <!-- Team 2 Individual Confirmation Toggle -->
+                        <button id="btn-confirm-t2" onclick="toggleTeamConfirmation(2)" class="w-full bg-zinc-900 border border-zinc-800 text-zinc-400 py-2.5 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all duration-300 flex items-center justify-center gap-2">
+                            <i class="fa-regular fa-circle"></i> <span>Confirm Away Score</span>
+                        </button>
+                    </div>
+
+                </div>
+
+                <!-- Admin Action Gate Alert -->
+                <div id="gate-warning-message" class="bg-zinc-950 border border-zinc-800/80 rounded-xl p-3 flex items-center gap-3 text-zinc-400 text-xs transition-all duration-300">
+                    <i class="fa-solid fa-lock text-amber-400 animate-pulse"></i>
+                    <span>Both teams must press their respective <b>Confirm Score</b> buttons before the administrator can push updates to the live global server.</span>
+                </div>
+            </div>
+
+            <!-- Upload Execution Bar -->
+            <div class="bg-zinc-950/80 border-t border-zinc-900 p-4 flex items-center justify-end gap-3">
+                <button onclick="closeScoreModal()" class="px-4 py-2.5 border border-zinc-800 bg-zinc-900/60 hover:bg-zinc-800 text-zinc-400 hover:text-white rounded-xl text-xs font-bold uppercase tracking-wider transition-colors">
+                    Discard
+                </button>
+                <button id="btn-upload-scores" onclick="executeScoreUpload()" disabled class="px-6 py-2.5 bg-zinc-900 text-zinc-600 border border-zinc-800/80 rounded-xl text-xs font-bold uppercase tracking-widest transition-all duration-300 flex items-center gap-2 cursor-not-allowed">
+                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                    <span>Upload Match Results</span>
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- CENTERED GENERAL NOTIFICATION & DELETION MODALS SYSTEM -->
+    <div id="custom-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 transition-all duration-300">
+        <div class="absolute inset-0 bg-zinc-950/80 backdrop-blur-md opacity-0 transition-opacity duration-300" id="custom-modal-overlay" onclick="hideModal()"></div>
+        <div class="bg-[#0b0e1e] border border-zinc-800 text-white rounded-3xl max-w-sm w-full p-5 sm:p-6 shadow-2xl relative z-10 transform scale-90 opacity-0 transition-all duration-300" id="modal-card">
+            <div id="modal-icon-container" class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center text-xl sm:text-2xl mb-4 mx-auto shadow-inner transition-all duration-300">
+                <i id="modal-icon" class="fa-solid"></i>
+            </div>
+            <h3 id="modal-title" class="text-sm sm:text-base font-extrabold text-center text-white tracking-tight"></h3>
+            <p id="modal-desc" class="text-zinc-400 text-[11px] sm:text-xs text-center mt-2 leading-relaxed"></p>
+            
+            <div id="modal-actions" class="flex items-center gap-3 mt-6"></div>
+        </div>
+    </div>
+
+    <!-- Footer Segment -->
+    <footer class="w-full text-center p-5 border-t border-zinc-900/80 bg-[#04050a] text-[9px] sm:text-[10px] text-zinc-600 font-bold uppercase tracking-widest z-10">
+        SmashMatch Badminton Matchmaking Engine &bull; System Pro R26
+    </footer>
+
+    <!-- Operational Systems Automation Logic -->
+    <script>
+        const sourceTeams = ["Apex Shuttle Overlords", "Net Rushers Club", "Smasher Knights", "Racket Masters Elite", "Flight Velocity"];
+        const sourcePlayers = ["Marcus Aurelius", "Lin Dan Pro", "Lee Chong Wei", "Viktor Axelsen", "Carolina Marin", "Tai Tzu-ying", "An Se-young", "Kento Momota"];
+
+        // Global State Parameters
+        let selectedFormat = 'Singles';
+        let matchFixtures = [
+            { id: 1, type: "Singles", label: "Finals Game 1", courtNum: "1", team1: "Apex Shuttle Overlords", player1a: "Lin Dan Pro", player1b: "", score1: 0, team1Confirmed: false, team2: "Net Rushers Club", player2a: "Lee Chong Wei", player2b: "", score2: 0, team2Confirmed: false }
+        ];
+        let activeEditingMatchId = null;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            populateConfigDropdowns();
+            refreshMatchUI();
+            autoIncrementLabel();
+        });
+
+        function navigateBack() {
+            document.getElementById('body-overlay').classList.add('opacity-0');
+            setTimeout(() => { window.location.href = './teams.html'; }, 500);
+        }
+
+        function populateConfigDropdowns() {
+            const t1 = document.getElementById('team-1-select');
+            const t2 = document.getElementById('team-2-select');
+            const p1a = document.getElementById('player-1a-select');
+            const p1b = document.getElementById('player-1b-select');
+            const p2a = document.getElementById('player-2a-select');
+            const p2b = document.getElementById('player-2b-select');
+
+            const optionsTeams = sourceTeams.map((team) => `<option value="${team}">${team}</option>`).join('');
+            t1.innerHTML = optionsTeams;
+            t2.innerHTML = sourceTeams.map((team, idx) => `<option value="${team}" ${idx === 1 ? 'selected':''}>${team}</option>`).join('');
+            
+            p1a.innerHTML = sourcePlayers.map((p, idx) => `<option value="${p}" ${idx === 1 ? 'selected':''}>${p}</option>`).join('');
+            p1b.innerHTML = sourcePlayers.map((p, idx) => `<option value="${p}" ${idx === 6 ? 'selected':''}>${p}</option>`).join('');
+            p2a.innerHTML = sourcePlayers.map((p, idx) => `<option value="${p}" ${idx === 2 ? 'selected':''}>${p}</option>`).join('');
+            p2b.innerHTML = sourcePlayers.map((p, idx) => `<option value="${p}" ${idx === 7 ? 'selected':''}>${p}</option>`).join('');
+        }
+
+        function changeMatchFormat(format) {
+            selectedFormat = format;
+            const btnSingles = document.getElementById('format-singles');
+            const btnDoubles = document.getElementById('format-doubles');
+            const wrapper1b = document.getElementById('wrapper-player-1b');
+            const wrapper2b = document.getElementById('wrapper-player-2b');
+
+            if (format === 'Singles') {
+                btnSingles.className = "py-2 px-3 text-xs font-bold uppercase tracking-wide rounded-lg transition-all duration-300 bg-cyan-500 text-slate-950 shadow-md";
+                btnDoubles.className = "py-2 px-3 text-xs font-bold uppercase tracking-wide rounded-lg transition-all duration-300 text-zinc-400 hover:text-white";
+                wrapper1b.classList.remove('expanded');
+                wrapper2b.classList.remove('expanded');
+            } else {
+                btnDoubles.className = "py-2 px-3 text-xs font-bold uppercase tracking-wide rounded-lg transition-all duration-300 bg-fuchsia-500 text-white shadow-md";
+                btnSingles.className = "py-2 px-3 text-xs font-bold uppercase tracking-wide rounded-lg transition-all duration-300 text-zinc-400 hover:text-white";
+                wrapper1b.classList.add('expanded');
+                wrapper2b.classList.add('expanded');
+            }
+        }
+
+        function showCustomModal({ title, desc, icon, iconTheme, actions }) {
+            const modal = document.getElementById('custom-modal');
+            const overlay = document.getElementById('custom-modal-overlay');
+            const card = document.getElementById('modal-card');
+            
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-desc').innerText = desc;
+            document.getElementById('modal-icon').className = `fa-solid ${icon}`;
+            document.getElementById('modal-icon-container').className = `w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center text-xl mb-4 mx-auto ${iconTheme}`;
+            
+            document.getElementById('modal-actions').innerHTML = actions.map((act) => `
+                <button onclick="${act.action}" class="w-full text-[11px] sm:text-xs uppercase tracking-widest font-bold rounded-xl py-2.5 sm:py-3 transition-all duration-200 ${act.style}">
+                    ${act.text}
+                </button>
+            `).join('');
+
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                overlay.classList.remove('opacity-0');
+                card.classList.remove('scale-90', 'opacity-0');
+                card.classList.add('scale-100', 'opacity-100');
+            }, 20);
+        }
+
+        function hideModal() {
+            const overlay = document.getElementById('custom-modal-overlay');
+            const card = document.getElementById('modal-card');
+            
+            overlay.classList.add('opacity-0');
+            card.classList.remove('scale-100', 'opacity-100');
+            card.classList.add('scale-90', 'opacity-0');
+            setTimeout(() => { document.getElementById('custom-modal').classList.add('hidden'); }, 300);
+        }
+
+        function autoIncrementLabel() {
+            const labelInput = document.getElementById('game-label');
+            labelInput.value = matchFixtures.length === 0 ? "Game 1" : `Game ${matchFixtures.length + 1}`;
+        }
+
+        function commitManualMatch() {
+            const labelInput = document.getElementById('game-label');
+            const courtInput = document.getElementById('court-selection');
+            const t1Input = document.getElementById('team-1-select');
+            const t2Input = document.getElementById('team-2-select');
+            const p1aInput = document.getElementById('player-1a-select');
+            const p1bInput = document.getElementById('player-1b-select');
+            const p2aInput = document.getElementById('player-2a-select');
+            const p2bInput = document.getElementById('player-2b-select');
+
+            const labelVal = labelInput.value.trim();
+            const courtVal = courtInput.value.trim() || "1";
+
+            if (!labelVal || t1Input.value === t2Input.value) {
+                showCustomModal({
+                    title: 'Roster Logic Fault',
+                    desc: !labelVal ? 'Please fill out a distinct match name label asset.' : 'Clubs cannot play internal matches on the live ledger. Choose a different Away Club.',
+                    icon: 'fa-triangle-exclamation',
+                    iconTheme: 'bg-amber-500/10 border border-amber-500/20 text-amber-400',
+                    actions: [{ text: 'Adjust configuration', action: 'hideModal()', style: 'bg-zinc-850 hover:bg-zinc-800 border border-zinc-700 text-white' }]
+                });
+                return;
+            }
+
+            if (selectedFormat === 'Doubles' && (p1aInput.value === p1bInput.value || p2aInput.value === p2bInput.value)) {
+                showCustomModal({
+                    title: 'Roster Logic Fault',
+                    desc: 'Partners cannot be identical. Please verify distinct athletes inside the alliance.',
+                    icon: 'fa-user-group',
+                    iconTheme: 'bg-rose-500/10 border border-rose-500/20 text-rose-400',
+                    actions: [{ text: 'Adjust configuration', action: 'hideModal()', style: 'bg-zinc-850 hover:bg-zinc-800 border border-zinc-700 text-white' }]
+                });
+                return;
+            }
+
+            matchFixtures.push({
+                id: Date.now(),
+                type: selectedFormat,
+                label: labelVal,
+                courtNum: courtVal,
+                team1: t1Input.value,
+                player1a: p1aInput.value,
+                player1b: selectedFormat === 'Doubles' ? p1bInput.value : '',
+                score1: 0,
+                team1Confirmed: false,
+                team2: t2Input.value,
+                player2a: p2aInput.value,
+                player2b: selectedFormat === 'Doubles' ? p2bInput.value : '',
+                score2: 0,
+                team2Confirmed: false
+            });
+            
+            autoIncrementLabel();
+            refreshMatchUI();
+        }
+
+        /* --- SCORE ROOM SYSTEM MODAL CONTROLS --- */
+        function openScoreRoom(id) {
+            activeEditingMatchId = id;
+            const match = matchFixtures.find(m => m.id === id);
+            if (!match) return;
+
+            document.getElementById('score-modal-heading').innerText = `${match.label} [${match.type}] - Score Deck`;
+            document.getElementById('score-t1-name').innerText = match.team1;
+            document.getElementById('score-p1-name').innerHTML = match.type === 'Doubles' 
+                ? `<i class="fa-solid fa-user-group text-[9px] mr-1 text-cyan-400/60"></i>${match.player1a} <br/> <i class="fa-solid fa-user-group text-[9px] mr-1 text-cyan-400/60"></i>${match.player1b}`
+                : `<i class="fa-solid fa-user text-[9px] mr-1 text-cyan-400/60"></i>${match.player1a}`;
+            document.getElementById('score-t1-pts').value = match.score1;
+
+            document.getElementById('score-t2-name').innerText = match.team2;
+            document.getElementById('score-p2-name').innerHTML = match.type === 'Doubles' 
+                ? `<i class="fa-solid fa-user-group text-[9px] mr-1 text-fuchsia-400/60"></i>${match.player2a} <br/> <i class="fa-solid fa-user-group text-[9px] mr-1 text-fuchsia-400/60"></i>${match.player2b}`
+                : `<i class="fa-solid fa-user text-[9px] mr-1 text-fuchsia-400/60"></i>${match.player2a}`;
+            document.getElementById('score-t2-pts').value = match.score2;
+
+            renderConfirmationButtonState(1, match.team1Confirmed);
+            renderConfirmationButtonState(2, match.team2Confirmed);
+            evaluateGateValidation();
+
+            const modal = document.getElementById('score-modal');
+            const overlay = document.getElementById('score-modal-overlay');
+            const card = document.getElementById('score-modal-card');
+            
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                overlay.classList.remove('opacity-0');
+                card.classList.remove('scale-90', 'opacity-0');
+                card.classList.add('scale-100', 'opacity-100');
+            }, 20);
+        }
+
+        function closeScoreModal() {
+            const overlay = document.getElementById('score-modal-overlay');
+            const card = document.getElementById('score-modal-card');
+            
+            overlay.classList.add('opacity-0');
+            card.classList.remove('scale-100', 'opacity-100');
+            card.classList.add('scale-90', 'opacity-0');
+            setTimeout(() => { document.getElementById('score-modal').classList.add('hidden'); }, 300);
+            activeEditingMatchId = null;
+        }
+
+        function toggleTeamConfirmation(teamIndex) {
+            const match = matchFixtures.find(m => m.id === activeEditingMatchId);
+            if (!match) return;
+
+            if (teamIndex === 1) {
+                match.team1Confirmed = !match.team1Confirmed;
+                renderConfirmationButtonState(1, match.team1Confirmed);
+            } else {
+                match.team2Confirmed = !match.team2Confirmed;
+                renderConfirmationButtonState(2, match.team2Confirmed);
+            }
+            evaluateGateValidation();
+        }
+
+        function renderConfirmationButtonState(teamIndex, isConfirmed) {
+            const btn = document.getElementById(`btn-confirm-t${teamIndex}`);
+            if (isConfirmed) {
+                btn.className = "w-full bg-emerald-950/40 border border-emerald-500/30 text-emerald-400 py-2.5 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all duration-300 flex items-center justify-center gap-2 shadow-sm scale-98";
+                btn.innerHTML = `<i class="fa-solid fa-square-check text-xs"></i> <span>Score Verified</span>`;
+            } else {
+                btn.className = "w-full bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-zinc-200 py-2.5 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all duration-300 flex items-center justify-center gap-2 scale-100";
+                btn.innerHTML = `<i class="fa-regular fa-circle"></i> <span>Confirm Score</span>`;
+            }
+        }
+
+        function evaluateGateValidation() {
+            const match = matchFixtures.find(m => m.id === activeEditingMatchId);
+            const uploadBtn = document.getElementById('btn-upload-scores');
+            const warnBox = document.getElementById('gate-warning-message');
+
+            if (match && match.team1Confirmed && match.team2Confirmed) {
+                uploadBtn.disabled = false;
+                uploadBtn.className = "px-6 py-2.5 bg-gradient-to-r from-cyan-400 to-indigo-500 hover:opacity-95 text-zinc-950 shadow-md shadow-cyan-500/10 font-bold rounded-xl text-xs uppercase tracking-widest transition-all duration-300 active:scale-[0.98] cursor-pointer";
+                warnBox.className = "bg-emerald-950/30 border border-emerald-500/20 rounded-xl p-3 flex items-center gap-3 text-emerald-400 text-xs transition-all duration-300 transform scale-100";
+                warnBox.innerHTML = `<i class="fa-solid fa-lock-open text-emerald-400"></i> <span>Integrity cleared. Team confirmations secured. Administrator authorized to upload.</span>`;
+            } else {
+                uploadBtn.disabled = true;
+                uploadBtn.className = "px-6 py-2.5 bg-zinc-900 text-zinc-600 border border-zinc-800/80 rounded-xl text-xs font-bold uppercase tracking-widest transition-all duration-300 cursor-not-allowed";
+                warnBox.className = "bg-zinc-950 border border-zinc-800/80 rounded-xl p-3 flex items-center gap-3 text-zinc-400 text-xs transition-all duration-300";
+                warnBox.innerHTML = `<i class="fa-solid fa-lock text-amber-500/80 animate-pulse"></i> <span>Both teams must press their respective <b>Confirm Score</b> buttons before the administrator can push updates to the live global server.</span>`;
+            }
+        }
+
+        function executeScoreUpload() {
+            const match = matchFixtures.find(m => m.id === activeEditingMatchId);
+            if (!match) return;
+
+            match.score1 = parseInt(document.getElementById('score-t1-pts').value) || 0;
+            match.score2 = parseInt(document.getElementById('score-t2-pts').value) || 0;
+
+            closeScoreModal();
+            refreshMatchUI();
+
+            setTimeout(() => {
+                showCustomModal({
+                    title: 'Broadcast Synchronized',
+                    desc: `Scores for "${match.label}" have been saved and streamed successfully to the digital display.`,
+                    icon: 'fa-cloud-arrow-up',
+                    iconTheme: 'bg-cyan-500/10 border border-cyan-500/20 text-cyan-400',
+                    actions: [{ text: 'Dismiss Workspace', action: 'hideModal()', style: 'bg-zinc-900 text-white font-semibold border border-zinc-800' }]
+                });
+            }, 350);
+        }
+
+        function deleteMatch(id, event) {
+            event.stopPropagation(); 
+            const targetFixture = matchFixtures.find(m => m.id === id);
+            const titleLabel = targetFixture ? targetFixture.label : 'this game slot';
+
+            showCustomModal({
+                title: 'Scrub Arena Node',
+                desc: `Confirming the absolute removal of "${titleLabel}" from the active broadcast layout.`,
+                icon: 'fa-trash-can',
+                iconTheme: 'bg-rose-500/10 border border-rose-500/20 text-rose-400',
+                actions: [
+                    { text: 'Retain Match', action: 'hideModal()', style: 'bg-zinc-900 border border-zinc-800 text-zinc-300' },
+                    { text: 'Confirm Scrub', action: `executeDeleteMatch(${id})`, style: 'bg-rose-500 hover:bg-rose-600 text-zinc-950 font-bold' }
+                ]
+            });
+        }
+
+        function executeDeleteMatch(id) {
+            matchFixtures = matchFixtures.filter(m => m.id !== id);
+            hideModal();
+            autoIncrementLabel();
+            refreshMatchUI();
+        }
+
+        function clearAllMatches() {
+            if (matchFixtures.length === 0) return;
+
+            showCustomModal({
+                title: 'Format Entire Bracket',
+                desc: 'Are you absolutely sure you want to format all active live match listings?',
+                icon: 'fa-skull-crossbones',
+                iconTheme: 'bg-rose-500/10 border border-rose-500/20 text-rose-400',
+                actions: [
+                    { text: 'Cancel', action: 'hideModal()', style: 'bg-zinc-900 border border-zinc-800 text-zinc-300' },
+                    { text: 'Wipe Ledger', action: 'executeClearAllMatches()', style: 'bg-rose-500 hover:bg-rose-600 text-zinc-950 font-bold' }
+                ]
+            });
+        }
+
+        function executeClearAllMatches() {
+            matchFixtures = [];
+            hideModal();
+            autoIncrementLabel();
+            refreshMatchUI();
+        }
+
+        // Scoreboard Card Generation System
+        function refreshMatchUI() {
+            const container = document.getElementById('match-list');
+            const emptyPlaceholder = document.getElementById('empty-matches');
+            const counterText = document.getElementById('match-counter');
+
+            counterText.innerText = matchFixtures.length === 1 ? "1 Roster Loaded" : `${matchFixtures.length} Rosters Loaded`;
+
+            const dynamicRows = container.querySelectorAll('.staged-fixture-card');
+            dynamicRows.forEach(row => row.remove());
+
+            if (matchFixtures.length === 0) {
+                emptyPlaceholder.classList.remove('hidden');
+                return;
+            }
+
+            emptyPlaceholder.classList.add('hidden');
+
+            matchFixtures.forEach((match) => {
+                const card = document.createElement('div');
+                // Added hardware accelerated custom dynamic entry animation class
+                card.className = "staged-fixture-card bg-[#0e1122]/90 border border-zinc-800/80 rounded-2xl overflow-hidden shadow-xl hover:border-zinc-600/80 hover:scale-[1.02] transition-all duration-300 flex flex-col justify-between group glow-cyan cursor-pointer animate-fade-in-scale";
+                card.setAttribute("onclick", `openScoreRoom(${match.id})`);
+                
+                const systemCourtDisplay = `Court ${match.courtNum}`;
+                
+                const p1Render = match.type === 'Doubles' ? `${match.player1a} / ${match.player1b}` : match.player1a;
+                const p2Render = match.type === 'Doubles' ? `${match.player2a} / ${match.player2b}` : match.player2a;
+                const iconFormat = match.type === 'Doubles' ? 'fa-user-group text-cyan-400/60' : 'fa-user text-cyan-400/60';
+                const iconFormatAway = match.type === 'Doubles' ? 'fa-user-group text-fuchsia-400/60' : 'fa-user text-fuchsia-400/60';
+
+                card.innerHTML = `
+                    <!-- Card Top Header Row -->
+                    <div class="bg-zinc-950/80 px-4 py-3 border-b border-zinc-900 flex items-center justify-between gap-2">
+                        <div class="flex items-center gap-2 overflow-hidden">
+                            <span class="inline-block w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_6px_#22d3ee] animate-pulse flex-shrink-0"></span>
+                            <span class="text-[11px] font-extrabold text-zinc-300 tracking-wider uppercase truncate">${match.label} <span class="text-zinc-600 font-medium text-[9px] ml-1">[${match.type}]</span></span>
+                        </div>
+                        <div class="flex items-center gap-2 flex-shrink-0">
+                            <span class="text-[9px] font-bold text-cyan-400 border border-cyan-500/20 bg-cyan-950/60 px-2 py-0.5 rounded uppercase tracking-wider max-w-[90px] truncate" title="${systemCourtDisplay}">${systemCourtDisplay}</span>
+                            <button onclick="deleteMatch(${match.id}, event)" class="text-zinc-600 hover:text-rose-400 hover:bg-rose-500/10 w-6 h-6 rounded-md transition-all flex items-center justify-center">
+                                <i class="fa-solid fa-xmark text-xs"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Main Core Arena Duel Layout Box -->
+                    <div class="p-4 space-y-3 bg-gradient-to-b from-[#0e1122]/20 to-[#0a0c18]/60">
+                        <!-- Home Competitor Row -->
+                        <div class="bg-zinc-950/40 border border-zinc-900 rounded-xl p-3 flex items-center justify-between gap-3 shadow-inner hover:bg-zinc-900/30 transition-colors duration-200">
+                            <div class="overflow-hidden flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-lg bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 font-black text-xs flex items-center justify-center flex-shrink-0 shadow-inner">
+                                    H
+                                </div>
+                                <div class="overflow-hidden">
+                                    <span class="text-xs font-bold text-zinc-200 tracking-wide block truncate" title="${match.team1}">${match.team1}</span>
+                                    <span class="text-[11px] font-medium text-zinc-400 block truncate mt-0.5" title="${p1Render}"><i class="fa-solid ${iconFormat} text-[9px] mr-1.5"></i>${p1Render}</span>
+                                </div>
+                            </div>
+                            <div class="text-xl font-black text-cyan-400 bg-zinc-900/90 border border-zinc-800/60 w-10 h-9 flex items-center justify-center rounded-lg px-1 transition-transform duration-300 group-hover:scale-105">${match.score1}</div>
+                        </div>
+
+                        <!-- Mid Split Versus Divider Badge -->
+                        <div class="flex items-center justify-center relative py-1.5">
+                            <div class="absolute inset-x-0 top-1/2 h-px bg-zinc-900 z-0"></div>
+                            <span class="text-[8px] font-black tracking-widest bg-zinc-900 border border-zinc-800 text-zinc-500 px-3 py-0.5 rounded-full z-10 relative uppercase italic">ENTER DATA</span>
+                        </div>
+
+                        <!-- Away Competitor Row -->
+                        <div class="bg-zinc-950/40 border border-zinc-900 rounded-xl p-3 flex items-center justify-between gap-3 shadow-inner hover:bg-zinc-900/30 transition-colors duration-200">
+                            <div class="overflow-hidden flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-lg bg-fuchsia-500/10 border border-fuchsia-500/20 text-fuchsia-400 font-black text-xs flex items-center justify-center flex-shrink-0 shadow-inner">
+                                    A
+                                </div>
+                                <div class="overflow-hidden">
+                                    <span class="text-xs font-bold text-zinc-200 tracking-wide block truncate" title="${match.team2}">${match.team2}</span>
+                                    <span class="text-[11px] font-medium text-zinc-400 block truncate mt-0.5" title="${p2Render}"><i class="fa-solid ${iconFormatAway} text-[9px] mr-1.5"></i>${p2Render}</span>
+                                </div>
+                            </div>
+                            <div class="text-xl font-black text-fuchsia-400 bg-zinc-900/90 border border-zinc-800/60 w-10 h-9 flex items-center justify-center rounded-lg px-1 transition-transform duration-300 group-hover:scale-105">${match.score2}</div>
+                        </div>
+                    </div>
+
+                    <!-- Card Footer Detail Status Bar -->
+                    <div class="bg-zinc-950/60 border-t border-zinc-900/60 px-4 py-2.5 flex items-center justify-between text-[10px] text-zinc-500 font-semibold tracking-wide uppercase">
+                        <span class="flex items-center gap-1.5">
+                            ${match.team1Confirmed && match.team2Confirmed 
+                                ? `<i class="fa-solid fa-circle text-[7px] text-emerald-400 shadow-[0_0_4px_#34d399]"></i> Matches Verified` 
+                                : `<i class="fa-solid fa-circle text-[7px] text-amber-500 shadow-[0_0_4px_#f59e0b] animate-pulse"></i> Scoring Active`}
+                        </span>
+                        <span class="text-zinc-600 text-right text-[9px] font-black tracking-wider group-hover:text-zinc-400 transition-colors"><i class="fa-solid fa-expand text-[8px] mr-1"></i> Edit Score</span>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+    </script>
+</body>
+</html>
