@@ -14,8 +14,12 @@
         body { font-family: 'Poppins', sans-serif; }
         .shuttle-rotate { animation: spin 20s linear infinite; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
-        /* Premium custom elastic transition cubic-bezier for toasts */
-        .toast-transition { transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
+        /* Premium custom elastic transition cubic-bezier for toasts and modals */
+        .toast-transition, .modal-transition { transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
+        /* Hide arrows/spinners on number inputs */
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type=number] { -moz-appearance: textfield; }
     </style>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between antialiased selection:bg-emerald-500 selection:text-slate-900 relative overflow-x-hidden transition-opacity duration-700 ease-in-out" id="body-overlay">
@@ -55,7 +59,7 @@
                     <div>
                         <div class="flex justify-between items-center mb-2">
                             <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-widest">Password</label>
-                            <a href="#" class="text-xs font-semibold text-cyan-400/90 hover:text-cyan-300 transition-colors tracking-wide">Forgot?</a>
+                            <button type="button" onclick="openModal()" class="text-xs font-semibold text-cyan-400/90 hover:text-cyan-300 transition-colors tracking-wide focus:outline-none">Forgot?</button>
                         </div>
                         <div class="relative group">
                             <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-500 group-focus-within:text-emerald-400 transition-colors duration-300">
@@ -90,9 +94,83 @@
         </div>
     </main>
 
-    <div class="fixed bottom-6 right-6 left-6 sm:left-auto sm:w-85 z-50 pointer-events-none">
-        <div id="toast-container" class="space-y-3 flex flex-col justify-end items-end w-full">
+    <div id="forgot-password-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 invisible pointer-events-none">
+        <div id="modal-backdrop" onclick="closeModal()" class="absolute inset-0 bg-slate-950/60 backdrop-blur-sm opacity-0 transition-opacity duration-300 ease-out"></div>
+        
+        <div id="modal-card" class="modal-transition opacity-0 scale-95 translate-y-4 w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.7)] z-10 relative overflow-hidden">
+            <button onclick="closeModal()" class="absolute top-5 right-5 text-slate-500 hover:text-slate-300 transition-colors focus:outline-none z-20">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+            
+            <div id="stage-email" class="transition-all duration-300 opacity-100 block">
+                <div class="mb-6">
+                    <div class="inline-flex items-center justify-center w-11 h-11 bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 rounded-xl mb-4">
+                        <i class="fa-solid fa-key text-lg"></i>
+                    </div>
+                    <h3 class="text-xl font-bold tracking-tight text-slate-100">Reset System Access</h3>
+                    <p class="text-slate-400 text-xs sm:text-sm mt-1.5 leading-relaxed font-medium">Input your verified ecosystem address below to generate transmission channels.</p>
+                </div>
+
+                <form id="forgot-form" onsubmit="handleForgotPassword(event)" novalidate class="space-y-5">
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2">Registered Email</label>
+                        <div class="relative group">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-500 group-focus-within:text-cyan-400 transition-colors duration-300">
+                                <i class="fa-solid fa-envelope text-sm"></i>
+                            </span>
+                            <input type="email" id="forgot-email" required 
+                                class="w-full bg-slate-950/60 border border-slate-800/80 rounded-xl py-3 pl-10 pr-4 text-white placeholder-slate-600 focus:outline-none focus:border-cyan-500/50 focus:ring-4 focus:ring-cyan-500/10 transition-all text-sm tracking-wide" 
+                                placeholder="name@example.com">
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row gap-3 pt-2">
+                        <button type="button" onclick="closeModal()" class="w-full sm:w-1/3 border border-slate-800 hover:bg-slate-800/50 text-slate-300 font-semibold tracking-wide rounded-xl py-3 text-sm transition-all duration-200">
+                            Cancel
+                        </button>
+                        <button type="submit" id="forgot-submit-btn" class="w-full sm:w-2/3 bg-gradient-to-r from-cyan-500 to-teal-500 text-slate-950 font-bold tracking-wide rounded-xl py-3 shadow-[0_4px_20px_rgba(6,182,212,0.15)] hover:opacity-95 hover:shadow-[0_4px_25px_rgba(6,182,212,0.25)] active:scale-[0.98] transition-all duration-300 flex items-center justify-center gap-2">
+                            <span id="forgot-btn-text">Transmit Link</span>
+                            <i id="forgot-btn-icon" class="fa-solid fa-paper-plane text-xs"></i>
+                        </button>
+                    </div>
+                </form>
             </div>
+
+            <div id="stage-otp" class="transition-all duration-300 opacity-0 hidden">
+                <div class="mb-6">
+                    <div class="inline-flex items-center justify-center w-11 h-11 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-xl mb-4">
+                        <i class="fa-solid fa-shield-halved text-lg"></i>
+                    </div>
+                    <h3 class="text-xl font-bold tracking-tight text-slate-100">Security Verification</h3>
+                    <p class="text-slate-400 text-xs sm:text-sm mt-1.5 leading-relaxed font-medium">A 6-digit confirmation protocol block was deployed to your terminal inbox. Enter matrix code digits to verify authenticity.</p>
+                </div>
+
+                <form id="otp-form" onsubmit="handleOTPVerification(event)" class="space-y-6">
+                    <div class="flex justify-between gap-2 sm:gap-3" id="otp-inputs-wrapper">
+                        <input type="number" maxlength="1" required class="otp-field w-12 h-14 sm:w-14 sm:h-16 text-center text-xl font-bold bg-slate-950/60 border border-slate-800/80 text-emerald-400 rounded-xl focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all">
+                        <input type="number" maxlength="1" required class="otp-field w-12 h-14 sm:w-14 sm:h-16 text-center text-xl font-bold bg-slate-950/60 border border-slate-800/80 text-emerald-400 rounded-xl focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all">
+                        <input type="number" maxlength="1" required class="otp-field w-12 h-14 sm:w-14 sm:h-16 text-center text-xl font-bold bg-slate-950/60 border border-slate-800/80 text-emerald-400 rounded-xl focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all">
+                        <input type="number" maxlength="1" required class="otp-field w-12 h-14 sm:w-14 sm:h-16 text-center text-xl font-bold bg-slate-950/60 border border-slate-800/80 text-emerald-400 rounded-xl focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all">
+                        <input type="number" maxlength="1" required class="otp-field w-12 h-14 sm:w-14 sm:h-16 text-center text-xl font-bold bg-slate-950/60 border border-slate-800/80 text-emerald-400 rounded-xl focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all">
+                        <input type="number" maxlength="1" required class="otp-field w-12 h-14 sm:w-14 sm:h-16 text-center text-xl font-bold bg-slate-950/60 border border-slate-800/80 text-emerald-400 rounded-xl focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all">
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row gap-3 pt-1">
+                        <button type="button" onclick="backToEmailStage()" class="w-full sm:w-1/3 border border-slate-800 hover:bg-slate-800/50 text-slate-300 font-semibold tracking-wide rounded-xl py-3 text-sm transition-all duration-200">
+                            Back
+                        </button>
+                        <button type="submit" id="otp-submit-btn" class="w-full sm:w-2/3 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 text-slate-950 font-bold tracking-wide rounded-xl py-3 shadow-[0_4px_20px_rgba(16,185,129,0.15)] hover:opacity-95 hover:shadow-[0_4px_25px_rgba(16,185,129,0.25)] active:scale-[0.98] transition-all duration-300 flex items-center justify-center gap-2">
+                            <span id="otp-btn-text">Verify Identity</span>
+                            <i id="otp-btn-icon" class="fa-solid fa-unlock text-xs"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="fixed bottom-6 right-6 left-6 sm:left-auto sm:w-85 z-50 pointer-events-none">
+        <div id="toast-container" class="space-y-3 flex flex-col justify-end items-end w-full"></div>
     </div>
 
     <footer class="w-full text-center p-5 z-10 border-t border-slate-900 bg-slate-950/60 backdrop-blur-md text-[10px] font-bold tracking-widest text-slate-600 uppercase">
@@ -110,6 +188,148 @@
                 passwordInput.type = 'password';
                 toggleIcon.classList.replace('fa-eye-slash', 'fa-eye');
             }
+        }
+
+        // Modal State Engine Configuration
+        function openModal() {
+            const modal = document.getElementById('forgot-password-modal');
+            const backdrop = document.getElementById('modal-backdrop');
+            const card = document.getElementById('modal-card');
+            
+            modal.classList.remove('invisible');
+            modal.classList.add('pointer-events-auto');
+            
+            setTimeout(() => {
+                backdrop.classList.replace('opacity-0', 'opacity-100');
+                card.classList.remove('opacity-0', 'scale-95', 'translate-y-4');
+                document.getElementById('forgot-email').focus();
+            }, 10);
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('forgot-password-modal');
+            const backdrop = document.getElementById('modal-backdrop');
+            const card = document.getElementById('modal-card');
+            
+            backdrop.classList.replace('opacity-100', 'opacity-0');
+            card.classList.add('opacity-0', 'scale-95', 'translate-y-4');
+            modal.classList.remove('pointer-events-auto');
+            
+            setTimeout(() => {
+                modal.classList.add('invisible');
+                backToEmailStage(); 
+                document.getElementById('forgot-form').reset();
+                document.getElementById('otp-form').reset();
+            }, 500);
+        }
+
+        // Processing Transmit Action -> Shifting into OTP Layer Form
+        function handleForgotPassword(event) {
+            event.preventDefault();
+            const email = document.getElementById('forgot-email').value;
+            const submitBtn = document.getElementById('forgot-submit-btn');
+            const btnText = document.getElementById('forgot-btn-text');
+            const btnIcon = document.getElementById('forgot-btn-icon');
+
+            if (!email || !email.includes('@')) {
+                showToast('error', 'Routing Interrupted', 'The email format you supplied is invalid. Verify configuration syntax parameters.');
+                return;
+            }
+
+            submitBtn.disabled = true;
+            btnText.innerText = "Transmitting Path";
+            btnIcon.className = "fa-solid fa-circle-notch text-xs animate-spin";
+
+            setTimeout(() => {
+                showToast('success', 'Transmission Successful', 'Verification array transmitted. Terminal link established.');
+                
+                // Animate Stage View Flip Transitions smoothly
+                const emailStage = document.getElementById('stage-email');
+                const otpStage = document.getElementById('stage-otp');
+                
+                emailStage.classList.add('opacity-0');
+                setTimeout(() => {
+                    emailStage.classList.replace('block', 'hidden');
+                    otpStage.classList.replace('hidden', 'block');
+                    setTimeout(() => {
+                        otpStage.classList.remove('opacity-0');
+                        document.querySelector('.otp-field').focus();
+                    }, 20);
+                }, 300);
+
+                // Reset stage button configurations
+                setTimeout(() => {
+                    submitBtn.disabled = false;
+                    btnText.innerText = "Transmit Link";
+                    btnIcon.className = "fa-solid fa-paper-plane text-xs";
+                }, 500);
+            }, 1200);
+        }
+
+        // Automated Step Jump Mechanics for Key Event Logging inside OTP Arrays
+        const fields = document.querySelectorAll('.otp-field');
+        fields.forEach((field, index) => {
+            field.addEventListener('input', (e) => {
+                if (field.value.length > 1) {
+                    field.value = field.value.slice(0, 1);
+                }
+                if (field.value !== "" && index < fields.length - 1) {
+                    fields[index + 1].focus();
+                }
+            });
+
+            field.addEventListener('keydown', (e) => {
+                if (e.key === "Backspace" && field.value === "" && index > 0) {
+                    fields[index - 1].focus();
+                }
+            });
+        });
+
+        // OTP Structural Identity Validation Handler
+        function handleOTPVerification(event) {
+            event.preventDefault();
+            const submitBtn = document.getElementById('otp-submit-btn');
+            const btnText = document.getElementById('otp-btn-text');
+            const btnIcon = document.getElementById('otp-btn-icon');
+            
+            let verificationCode = "";
+            fields.forEach(f => verificationCode += f.value);
+
+            if (verificationCode.length < 6) {
+                showToast('error', 'Integrity Check Aborted', 'Incomplete array telemetry. The 6-digit access parameters must be completely populated.');
+                return;
+            }
+
+            submitBtn.disabled = true;
+            btnText.innerText = "Validating Nodes";
+            btnIcon.className = "fa-solid fa-circle-notch text-xs animate-spin";
+
+            // Simulating analytical data decoding pass
+            setTimeout(() => {
+                showToast('success', 'Identity Re-verified', 'Cryptographic confirmation successful. Root profile unlocked.');
+                closeModal();
+                
+                setTimeout(() => {
+                    submitBtn.disabled = false;
+                    btnText.innerText = "Verify Identity";
+                    btnIcon.className = "fa-solid fa-unlock text-xs";
+                }, 500);
+            }, 1500);
+        }
+
+        function backToEmailStage() {
+            const emailStage = document.getElementById('stage-email');
+            const otpStage = document.getElementById('stage-otp');
+            
+            otpStage.classList.add('opacity-0');
+            setTimeout(() => {
+                otpStage.classList.replace('block', 'hidden');
+                emailStage.classList.replace('hidden', 'block');
+                setTimeout(() => {
+                    emailStage.classList.remove('opacity-0');
+                    document.getElementById('forgot-email').focus();
+                }, 20);
+            }, 300);
         }
 
         // Custom Dynamic Toast Micro-Engine Component
@@ -135,7 +355,6 @@
             
             container.insertAdjacentHTML('beforeend', toastHtml);
             
-            // Layout reflow execution transition
             setTimeout(() => {
                 const element = document.getElementById(id);
                 if(element) {
@@ -143,7 +362,6 @@
                 }
             }, 30);
 
-            // Global 4.5s lifespan configuration management
             setTimeout(() => { dismissToast(id); }, 4500);
         }
 
@@ -182,7 +400,7 @@
                 btnText.innerText = "Connecting Framework";
                 btnIcon.className = "fa-solid fa-circle-notch text-xs animate-spin";
                 
-                showToast('success', 'Credentials Successful');
+                showToast('success', 'Login Successful', 'Valid credentials analyzed. Syncing matchmaking...');
 
                 setTimeout(() => {
                     bodyOverlay.classList.add('opacity-0');
