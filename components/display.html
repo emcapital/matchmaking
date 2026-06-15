@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmashMatch - Arena Live Matrix</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Inter & Space Grotesk for heavy-duty sports tracking layout -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght=700;900&family=Inter:wght=400;600;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif;
+            background-color: #0b0f19;
+        }
+        .sports-font {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: -0.03em;
+        }
+        /* Aggressive Sporty Visual styling blocks */
+        .court-bg {
+            background: radial-gradient(100% 100% at 50% 0%, #132421 0%, #0c111d 100%);
+            border-top: 3px solid #10b981;
+        }
+        .sports-card {
+            background: linear-gradient(135deg, #121826 0%, #0d121f 100%);
+            border: 1px solid #1e293b;
+            position: relative;
+        }
+        /* Slanted slash accent tags typical of premium stadium graphics */
+        .slanted-tag {
+            transform: skewX(-12deg);
+        }
+        .slanted-content {
+            transform: skewX(12deg);
+        }
+        /* Hide scrollbars completely across presentation instances */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="text-slate-100 h-screen max-h-screen flex flex-col justify-between antialiased relative overflow-hidden select-none">
+
+    <!-- High-Contrast Court Grid Overlay -->
+    <div class="absolute inset-0 bg-[linear-gradient(to_right,rgba(16,185,129,0.04)_1px,transparent_1px),linear-gradient(to_bottom,rgba(16,185,129,0.04)_1px,transparent_1px)] bg-[size:3rem_3rem] [mask-image:linear-gradient(to_bottom,rgba(0,0,0,1)_60%,transparent_100%)] z-0"></div>
+    <!-- Bold energetic stadium lights behind the UI -->
+    <div class="absolute top-0 right-1/3 w-[50rem] h-[25rem] bg-emerald-500/10 rounded-full filter blur-[150px] pointer-events-none z-0"></div>
+
+    <!-- Header Block (Stadium Titleboard Style) -->
+    <header class="w-full bg-slate-950 border-b-2 border-slate-800 z-10 px-8 py-3.5 flex-shrink-0">
+        <div class="max-w-[96rem] mx-auto flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <!-- High-vis tournament badge icon -->
+                <div class="bg-emerald-400 text-slate-950 font-black px-4 py-1 rounded shadow-[0_0_20px_rgba(16,185,129,0.3)] flex-shrink-0 slanted-tag">
+                    <span class="inline-block text-sm tracking-tighter sports-font slanted-content"><i class="fa-solid fa-trophy mr-1.5"></i>LIVE</span>
+                </div>
+                <div>
+                    <span class="text-2xl font-black text-white tracking-tighter sports-font italic block">SMASHMATCH CHAMPIONSHIPS</span>
+                    <span class="text-[10px] font-extrabold tracking-widest uppercase text-emerald-400 block -mt-0.5">Court Feed Network Engine</span>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-3 flex-shrink-0">
+                <div class="bg-slate-900 border border-slate-800 px-4 py-1.5 rounded text-xs font-black font-mono tracking-wider text-slate-300" id="live-timestamp">
+                    00:00:00
+                </div>
+                <div class="bg-slate-900 border-l-4 border-emerald-400 px-4 py-1.5 text-xs font-black text-white uppercase tracking-wider sports-font italic">
+                    Grand Arena Stage
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Unified Display Arena Workspace -->
+    <main class="flex-grow max-w-[96rem] w-full mx-auto px-8 pt-6 pb-4 z-10 relative box-border grid grid-cols-12 gap-6 min-h-0">
+        
+        <!-- LEFT PANELS: UPCOMING MATCHES & RECENT GAMES (5/12 Columns) -->
+        <section class="col-span-5 flex flex-col justify-between min-h-0 gap-6">
+            
+            <!-- UPCOMING MATCHES LIST PANEL (Replaces Live Stream) -->
+            <div class="flex flex-col min-h-0 h-[48%]">
+                <div class="flex items-center justify-between mb-2 px-1 flex-shrink-0">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-calendar-days text-emerald-400 text-xs"></i>
+                        <h4 class="text-xs font-black text-slate-400 uppercase tracking-wider sports-font italic">Upcoming Match Schedule</h4>
+                    </div>
+                    <span class="text-[9px] font-black bg-slate-800 text-emerald-400 px-2 py-0.5 rounded tracking-wider">NEXT UP</span>
+                </div>
+                
+                <!-- Upcoming Matches Container -->
+                <div id="upcoming-container" class="flex flex-col flex-grow overflow-hidden no-scrollbar relative">
+                    <div id="upcoming-content" class="flex flex-col gap-2 w-full">
+                        
+                        <!-- Match 1 -->
+                        <div class="sports-card rounded-xl p-3 flex items-center justify-between border-r-2 border-r-slate-700">
+                            <div class="flex items-center gap-3">
+                                <div class="bg-slate-950 px-3 py-1.5 rounded border border-slate-800 text-center flex-shrink-0">
+                                    <span class="text-xs font-black text-emerald-400 font-mono tracking-tighter block sports-font italic">15:15</span>
+                                    <span class="text-[8px] font-bold text-slate-500 block uppercase">START</span>
+                                </div>
+                                <div>
+                                    <div class="text-sm font-black text-white uppercase tracking-tight">Ivanov / Petrov</div>
+                                    <div class="text-[10px] font-bold text-slate-400 uppercase tracking-tight mt-0.5">vs Diaz / Silva</div>
+                                </div>
+                            </div>
+                            <span class="text-[9px] font-black bg-slate-900 border border-slate-800 text-slate-400 px-2 py-1 rounded uppercase sports-font">Court 2</span>
+                        </div>
+
+                        <!-- Match 2 -->
+                        <div class="sports-card rounded-xl p-3 flex items-center justify-between border-r-2 border-r-slate-700">
+                            <div class="flex items-center gap-3">
+                                <div class="bg-slate-950 px-3 py-1.5 rounded border border-slate-800 text-center flex-shrink-0">
+                                    <span class="text-xs font-black text-emerald-400 font-mono tracking-tighter block sports-font italic">16:00</span>
+                                    <span class="text-[8px] font-bold text-slate-500 block uppercase">START</span>
+                                </div>
+                                <div>
+                                    <div class="text-sm font-black text-white uppercase tracking-tight">O'Connor / Walsh</div>
+                                    <div class="text-[10px] font-bold text-slate-400 uppercase tracking-tight mt-0.5">vs Dupont / Martin</div>
+                                </div>
+                            </div>
+                            <span class="text-[9px] font-black bg-slate-900 border border-slate-800 text-slate-400 px-2 py-1 rounded uppercase sports-font">Court 1</span>
+                        </div>
+
+                        <!-- Match 3 -->
+                        <div class="sports-card rounded-xl p-3 flex items-center justify-between border-r-2 border-r-slate-700">
+                            <div class="flex items-center gap-3">
+                                <div class="bg-slate-950 px-3 py-1.5 rounded border border-slate-800 text-center flex-shrink-0">
+                                    <span class="text-xs font-black text-emerald-400 font-mono tracking-tighter block sports-font italic">16:45</span>
+                                    <span class="text-[8px] font-bold text-slate-500 block uppercase">START</span>
+                                </div>
+                                <div>
+                                    <div class="text-sm font-black text-white uppercase tracking-tight">Kim / Takahashi</div>
+                                    <div class="text-[10px] font-bold text-slate-400 uppercase tracking-tight mt-0.5">vs Taylor / Davies</div>
+                                </div>
+                            </div>
+                            <span class="text-[9px] font-black bg-slate-900 border border-slate-800 text-slate-400 px-2 py-1 rounded uppercase sports-font">Court 3</span>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- RECENT GAMES LOG PANEL (With Score Below Score Layout) -->
+            <div class="flex flex-col h-[48%] min-h-0">
+                <div class="flex items-center gap-2 mb-2 px-1 flex-shrink-0">
+                    <i class="fa-solid fa-clock-rotate-left text-emerald-400 text-xs"></i>
+                    <h4 class="text-xs font-black text-slate-400 uppercase tracking-wider sports-font italic">Recent Confrontation Logs</h4>
+                </div>
+                
+                <!-- Recent Matches Container -->
+                <div id="recent-container" class="flex flex-col flex-grow overflow-hidden no-scrollbar relative">
+                    <div id="recent-content" class="flex flex-col gap-2.5 w-full">
+                        
+                        <!-- Game 1 -->
+                        <div class="sports-card rounded-xl p-3 flex items-center justify-between border-l-4 border-l-emerald-400">
+                            <div class="flex-grow">
+                                <div class="flex items-center gap-2 mb-0.5">
+                                    <span class="text-[9px] font-black bg-emerald-400/10 text-emerald-400 px-1.5 py-0.5 rounded uppercase sports-font">Court 2</span>
+                                    <span class="text-[9px] font-bold text-slate-500 font-mono">FINAL</span>
+                                </div>
+                                <div class="text-sm font-black text-emerald-400 uppercase tracking-tight">
+                                    <i class="fa-solid fa-circle-check mr-1 text-[10px]"></i>Chen / Al-Hassan
+                                </div>
+                                <div class="text-xs font-bold text-slate-400 uppercase tracking-tight pl-3.5 mt-0.5">
+                                    Tan / Wijaya
+                                </div>
+                            </div>
+                            <!-- Score below score layout -->
+                            <div class="flex gap-1.5">
+                                <div class="bg-slate-950 border border-slate-800 w-9 py-1 rounded text-center sports-font text-white text-sm font-black italic">
+                                    <div class="text-emerald-400 border-b border-slate-800/60 pb-0.5">21</div>
+                                    <div class="text-slate-400 pt-0.5">18</div>
+                                </div>
+                                <div class="bg-slate-950 border border-slate-800 w-9 py-1 rounded text-center sports-font text-white text-sm font-black italic">
+                                    <div class="text-slate-400 border-b border-slate-800/60 pb-0.5">19</div>
+                                    <div class="text-emerald-400 pt-0.5">21</div>
+                                </div>
+                                <div class="bg-slate-950 border border-slate-800 w-9 py-1 rounded text-center sports-font text-white text-sm font-black italic">
+                                    <div class="text-emerald-400 border-b border-slate-800/60 pb-0.5">21</div>
+                                    <div class="text-slate-400 pt-0.5">15</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Game 2 -->
+                        <div class="sports-card rounded-xl p-3 flex items-center justify-between border-l-4 border-l-emerald-400">
+                            <div class="flex-grow">
+                                <div class="flex items-center gap-2 mb-0.5">
+                                    <span class="text-[9px] font-black bg-emerald-400/10 text-emerald-400 px-1.5 py-0.5 rounded uppercase sports-font">Court 1</span>
+                                    <span class="text-[9px] font-bold text-slate-500 font-mono">FINAL</span>
+                                </div>
+                                <div class="text-sm font-black text-emerald-400 uppercase tracking-tight">
+                                    <i class="fa-solid fa-circle-check mr-1 text-[10px]"></i>Marcus / Henderson
+                                </div>
+                                <div class="text-xs font-bold text-slate-400 uppercase tracking-tight pl-3.5 mt-0.5">
+                                    Gomez / Nielsen
+                                </div>
+                            </div>
+                            <!-- Score below score layout -->
+                            <div class="flex gap-1.5">
+                                <div class="bg-slate-950 border border-slate-800 w-9 py-1 rounded text-center sports-font text-white text-sm font-black italic">
+                                    <div class="text-emerald-400 border-b border-slate-800/60 pb-0.5">22</div>
+                                    <div class="text-slate-400 pt-0.5">20</div>
+                                </div>
+                                <div class="bg-slate-950 border border-slate-800 w-9 py-1 rounded text-center sports-font text-white text-sm font-black italic">
+                                    <div class="text-emerald-400 border-b border-slate-800/60 pb-0.5">21</div>
+                                    <div class="text-slate-400 pt-0.5">14</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Game 3 -->
+                        <div class="sports-card rounded-xl p-3 flex items-center justify-between border-l-4 border-l-emerald-400">
+                            <div class="flex-grow">
+                                <div class="flex items-center gap-2 mb-0.5">
+                                    <span class="text-[9px] font-black bg-emerald-400/10 text-emerald-400 px-1.5 py-0.5 rounded uppercase sports-font">Court 3</span>
+                                    <span class="text-[9px] font-bold text-slate-500 font-mono">FINAL</span>
+                                </div>
+                                <div class="text-sm font-black text-emerald-400 uppercase tracking-tight">
+                                    <i class="fa-solid fa-circle-check mr-1 text-[10px]"></i>Sato / Verhoeven
+                                </div>
+                                <div class="text-xs font-bold text-slate-400 uppercase tracking-tight pl-3.5 mt-0.5">
+                                    Lee / Nakamura
+                                </div>
+                            </div>
+                            <!-- Score below score layout -->
+                            <div class="flex gap-1.5">
+                                <div class="bg-slate-950 border border-slate-800 w-9 py-1 rounded text-center sports-font text-white text-sm font-black italic">
+                                    <div class="text-slate-400 border-b border-slate-800/60 pb-0.5">17</div>
+                                    <div class="text-emerald-400 pt-0.5">21</div>
+                                </div>
+                                <div class="bg-slate-950 border border-slate-800 w-9 py-1 rounded text-center sports-font text-white text-sm font-black italic">
+                                    <div class="text-emerald-400 border-b border-slate-800/60 pb-0.5">21</div>
+                                    <div class="text-slate-400 pt-0.5">19</div>
+                                </div>
+                                <div class="bg-slate-950 border border-slate-800 w-9 py-1 rounded text-center sports-font text-white text-sm font-black italic">
+                                    <div class="text-emerald-400 border-b border-slate-800/60 pb-0.5">24</div>
+                                    <div class="text-slate-400 pt-0.5">22</div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- RIGHT PANEL: PREMIUM EXTENDED STANDINGS MATRIX (7/12 Columns) -->
+        <section class="col-span-7 flex flex-col min-h-0">
+            <div class="flex items-center gap-2.5 mb-2 px-1 flex-shrink-0">
+                <h4 class="text-xs font-black text-slate-400 uppercase tracking-wider sports-font italic">Tournament Bracket Standings</h4>
+            </div>
+
+            <div class="w-full court-bg rounded-xl flex-grow min-h-0 flex flex-col overflow-hidden border-2 border-slate-800 shadow-2xl relative">
+                
+                <!-- Table Header Layout -->
+                <div class="bg-slate-950/90 text-slate-400 uppercase tracking-wider font-black text-[10px] border-b-2 border-slate-800 flex-shrink-0 w-full sports-font">
+                    <div class="flex w-full items-center py-4 px-6">
+                        <div class="w-14 text-center">Rank</div>
+                        <div class="flex-grow pl-3">Squad Pairing</div>
+                        <div class="w-20 text-center">Played</div>
+                        <div class="w-20 text-center">Won</div>
+                        <div class="w-24 text-center">Points</div>
+                        <div class="w-28 text-right pr-2">Form Ledger</div>
+                    </div>
+                </div>
+                
+                <!-- Infinite Auto-Scrolling Standings Frame -->
+                <div id="scrolling-container" class="flex-grow overflow-hidden no-scrollbar w-full">
+                    <div id="scrolling-content" class="w-full text-xs divide-y divide-slate-800/60 font-bold">
+                        
+                        <!-- Rank 1 -->
+                        <div class="flex w-full items-center py-4 px-6 bg-emerald-500/5 relative">
+                            <div class="absolute left-0 top-0 bottom-0 w-1 bg-emerald-400"></div>
+                            <div class="w-14 text-center text-lg font-black text-emerald-400 font-mono sports-font italic">01</div>
+                            <div class="flex-grow pl-3 text-white text-sm tracking-tight font-black uppercase truncate">Chen / Al-Hassan</div>
+                            <div class="w-20 text-center font-mono text-slate-300 sports-font">12</div>
+                            <div class="w-20 text-center font-mono text-emerald-400 sports-font">10</div>
+                            <div class="w-24 text-center font-mono font-black text-white bg-slate-900/80 py-1 rounded border border-slate-800 sports-font">320</div>
+                            <div class="w-28 text-right pr-2">
+                                <div class="inline-flex gap-1 text-[10px] font-black font-mono">
+                                    <span class="w-5 h-5 bg-emerald-400 text-slate-950 flex items-center justify-center rounded-sm">W</span>
+                                    <span class="w-5 h-5 bg-emerald-400 text-slate-950 flex items-center justify-center rounded-sm">W</span>
+                                    <span class="w-5 h-5 bg-emerald-400 text-slate-950 flex items-center justify-center rounded-sm">W</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Rank 2 -->
+                        <div class="flex w-full items-center py-4 px-6 relative">
+                            <div class="absolute left-0 top-0 bottom-0 w-1 bg-slate-500"></div>
+                            <div class="w-14 text-center text-lg font-black text-slate-400 font-mono sports-font italic">02</div>
+                            <div class="flex-grow pl-3 text-white text-sm tracking-tight font-black uppercase truncate">Marcus / Henderson</div>
+                            <div class="w-20 text-center font-mono text-slate-300 sports-font">11</div>
+                            <div class="w-20 text-center font-mono text-emerald-400 sports-font">9</div>
+                            <div class="w-24 text-center font-mono font-black text-white bg-slate-900/80 py-1 rounded border border-slate-800 sports-font">285</div>
+                            <div class="w-28 text-right pr-2">
+                                <div class="inline-flex gap-1 text-[10px] font-black font-mono">
+                                    <span class="w-5 h-5 bg-slate-800 text-rose-400 border border-rose-500/30 flex items-center justify-center rounded-sm">L</span>
+                                    <span class="w-5 h-5 bg-emerald-400 text-slate-950 flex items-center justify-center rounded-sm">W</span>
+                                    <span class="w-5 h-5 bg-emerald-400 text-slate-950 flex items-center justify-center rounded-sm">W</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Rank 3 -->
+                        <div class="flex w-full items-center py-4 px-6 relative">
+                            <div class="absolute left-0 top-0 bottom-0 w-1 bg-slate-500"></div>
+                            <div class="w-14 text-center text-lg font-black text-slate-400 font-mono sports-font italic">03</div>
+                            <div class="flex-grow pl-3 text-white text-sm tracking-tight font-black uppercase truncate">Sato / Verhoeven</div>
+                            <div class="w-20 text-center font-mono text-slate-300 sports-font">12</div>
+                            <div class="w-20 text-center font-mono text-emerald-400 sports-font">8</div>
+                            <div class="w-24 text-center font-mono font-black text-white bg-slate-900/80 py-1 rounded border border-slate-800 sports-font">260</div>
+                            <div class="w-28 text-right pr-2">
+                                <div class="inline-flex gap-1 text-[10px] font-black font-mono">
+                                    <span class="w-5 h-5 bg-emerald-400 text-slate-950 flex items-center justify-center rounded-sm">W</span>
+                                    <span class="w-5 h-5 bg-slate-800 text-rose-400 border border-rose-500/30 flex items-center justify-center rounded-sm">L</span>
+                                    <span class="w-5 h-5 bg-emerald-400 text-slate-950 flex items-center justify-center rounded-sm">W</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Rank 4 -->
+                        <div class="flex w-full items-center py-4 px-6">
+                            <div class="w-14 text-center text-base font-black text-slate-600 font-mono sports-font">04</div>
+                            <div class="flex-grow pl-3 text-slate-300 text-sm tracking-tight font-black uppercase truncate">Tan / Wijaya</div>
+                            <div class="w-20 text-center font-mono text-slate-400 sports-font">13</div>
+                            <div class="w-20 text-center font-mono text-emerald-400 sports-font">7</div>
+                            <div class="w-24 text-center font-mono font-black text-white bg-slate-900/80 py-1 rounded border border-slate-800 sports-font">230</div>
+                            <div class="w-28 text-right pr-2">
+                                <div class="inline-flex gap-1 text-[10px] font-black font-mono">
+                                    <span class="w-5 h-5 bg-slate-800 text-rose-400 border border-rose-500/30 flex items-center justify-center rounded-sm">L</span>
+                                    <span class="w-5 h-5 bg-emerald-400 text-slate-950 flex items-center justify-center rounded-sm">W</span>
+                                    <span class="w-5 h-5 bg-slate-800 text-rose-400 border border-rose-500/30 flex items-center justify-center rounded-sm">L</span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- HORIZONTAL SPONSORSHIP TICKER MARQUEE -->
+    <section class="w-full max-w-[96rem] mx-auto px-8 mb-4 flex-shrink-0 z-10 relative">
+        <div class="flex items-center gap-2 mb-1.5 px-1">
+            <h4 class="text-[10px] font-black text-slate-500 uppercase tracking-wider sports-font italic">Official League Partners</h4>
+        </div>
+        
+        <!-- Premium Sponsor Track Wrapper -->
+        <div id="carousel-window" class="w-full bg-slate-950/80 border border-slate-800 rounded-lg overflow-hidden py-3 px-6 relative flex items-center shadow-inner">
+            <div id="carousel-track" class="flex gap-16 items-center whitespace-nowrap will-change-transform">
+                
+                <!-- Sponsor 1 -->
+                <div class="inline-flex items-center gap-2 text-slate-400 tracking-tighter sports-font text-sm font-black italic opacity-60 hover:opacity-100 transition-opacity">
+                    <i class="fa-solid fa-bolt text-amber-400 text-base"></i> VOLT ENERGY
+                </div>
+
+                <!-- Sponsor 2 -->
+                <div class="inline-flex items-center gap-2 text-slate-400 tracking-tighter sports-font text-sm font-black italic opacity-60 hover:opacity-100 transition-opacity">
+                    <i class="fa-solid fa-layer-group text-emerald-400 text-base"></i> APEX NETWORKS
+                </div>
+
+                <!-- Sponsor 3 -->
+                <div class="inline-flex items-center gap-2 text-slate-400 tracking-tighter sports-font text-sm font-black italic opacity-60 hover:opacity-100 transition-opacity">
+                    <i class="fa-solid fa-gauge-high text-cyan-400 text-base"></i> VELOCITY LABS
+                </div>
+
+                <!-- Sponsor 4 -->
+                <div class="inline-flex items-center gap-2 text-slate-400 tracking-tighter sports-font text-sm font-black italic opacity-60 hover:opacity-100 transition-opacity">
+                    <i class="fa-solid fa-shield-halved text-indigo-400 text-base"></i> TITAN INSURANCE
+                </div>
+
+                <!-- Sponsor 5 -->
+                <div class="inline-flex items-center gap-2 text-slate-400 tracking-tighter sports-font text-sm font-black italic opacity-60 hover:opacity-100 transition-opacity">
+                    <i class="fa-solid fa-cube text-rose-400 text-base"></i> MATRIX DIGITAL
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer System Status Bar -->
+    <footer class="w-full flex items-center justify-between px-8 py-3 border-t-2 border-slate-800 bg-slate-950 text-[10px] font-black text-slate-500 uppercase z-10 flex-shrink-0 sports-font italic tracking-wider">
+        <span>SMASHMATCH LEAGUE TELEMETRY INFRASTRUCTURE &bull; 2026</span>
+        <span class="text-emerald-400"><i class="fa-solid fa-circle text-[8px] mr-1.5 align-middle animate-pulse"></i> FEED STATUS OVERWATCH ON</span>
+    </footer>
+
+    <!-- High-Performance Automation Script Systems -->
+    <script>
+        // System Clock Synchronization
+        function updateClock() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+            document.getElementById('live-timestamp').innerText = `LOCAL TIME • ${timeString}`;
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // Reusable Vertical Scroll Engine Factory
+        function createVerticalScroller(containerId, contentId, speed = 0.6) {
+            const container = document.getElementById(containerId);
+            const content = document.getElementById(contentId);
+            if (!container || !content) return;
+
+            const clone = content.cloneNode(true);
+            container.appendChild(clone);
+
+            let scrollPos = 0;
+            function scrollLoop() {
+                scrollPos += speed; 
+                container.scrollTop = scrollPos;
+                
+                if (scrollPos >= content.offsetHeight) {
+                    scrollPos = 0;
+                    container.scrollTop = 0;
+                }
+                requestAnimationFrame(scrollLoop);
+            }
+            requestAnimationFrame(scrollLoop);
+        }
+
+        // Smooth Infinite Horizontal Ticker Engine (Sponsor Loop)
+        function initHorizontalCarousel() {
+            const track = document.getElementById('carousel-track');
+            const items = Array.from(track.children);
+            if (!track || items.length === 0) return;
+            
+            items.forEach(item => {
+                const clone = item.cloneNode(true);
+                track.appendChild(clone);
+            });
+
+            let currentTranslate = 0;
+            const itemGap = 64; // Tailwind gap-16 is equivalent to 64px
+            
+            let totalWidth = 0;
+            for(let i = 0; i < items.length; i++) {
+                totalWidth += items[i].offsetWidth + itemGap;
+            }
+
+            function carouselLoop() {
+                currentTranslate -= 0.75; // Smooth scroll speed adjustment
+                if (Math.abs(currentTranslate) >= totalWidth) {
+                    currentTranslate = 0;
+                }
+                track.style.transform = `translateX(${currentTranslate}px)`;
+                requestAnimationFrame(carouselLoop);
+            }
+            requestAnimationFrame(carouselLoop);
+        }
+
+        // Initialize All Automation Channels safely upon load
+        window.addEventListener('load', () => {
+            // Left Panels
+            createVerticalScroller('upcoming-container', 'upcoming-content', 0.5);
+            createVerticalScroller('recent-container', 'recent-content', 0.55);
+            
+            // Right Panel
+            createVerticalScroller('scrolling-container', 'scrolling-content', 0.65);
+            
+            // Bottom Sponsor Track
+            initHorizontalCarousel();
+        });
+    </script>
+</body>
+</html>

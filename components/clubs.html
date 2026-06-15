@@ -4,172 +4,226 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SmashMatch - Select Club</title>
-    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght=300;400;500;600;700&display=swap" rel="stylesheet">
     
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    screens: {
+                        'xs': '400px',
+                    }
+                }
+            }
+        }
+    </script>
     <style>
         body { font-family: 'Poppins', sans-serif; }
+        .modal-transition { transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
     </style>
 </head>
-<body class="bg-slate-900 text-white min-h-screen flex flex-col justify-between antialiased selection:bg-emerald-500 selection:text-slate-900 relative transition-opacity duration-700 ease-in-out" id="body-overlay">
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between antialiased selection:bg-emerald-500 selection:text-slate-900 relative overflow-x-hidden transition-opacity duration-700 ease-in-out" id="body-overlay">
 
-    <!-- Ambient Decorative Background Blur -->
-    <div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0 opacity-10">
-        <div class="absolute -top-40 right-10 w-96 h-96 bg-cyan-500 rounded-full filter blur-3xl"></div>
-        <div class="absolute bottom-10 -left-20 w-96 h-96 bg-emerald-500 rounded-full filter blur-3xl"></div>
+    <div class="absolute inset-0 bg-[linear-gradient(to_right,#0f172a_1px,transparent_1px),linear-gradient(to_bottom,#0f172a_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] z-0 opacity-40"></div>
+    <div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0 opacity-25">
+        <div class="absolute -top-40 right-10 w-[30rem] h-[30rem] bg-cyan-500/20 rounded-full filter blur-[140px]"></div>
+        <div class="absolute bottom-10 -left-20 w-[30rem] h-[30rem] bg-emerald-500/20 rounded-full filter blur-[140px]"></div>
     </div>
 
-    <!-- Header Navigation -->
-    <header class="w-full border-b border-slate-800/80 bg-slate-950/40 backdrop-blur-md z-10 px-4 py-4">
+    <header class="w-full border-b border-slate-900/80 bg-slate-950/60 backdrop-blur-md z-10 px-4 py-4">
         <div class="max-w-6xl mx-auto flex items-center justify-between gap-4">
-            <div class="flex items-center gap-2">
-                <div class="w-9 h-9 bg-gradient-to-tr from-emerald-500 to-cyan-400 rounded-xl flex items-center justify-center shadow-md">
-                    <i class="fa-solid fa-shuttlecock text-slate-950 text-lg"></i>
+            <div class="flex items-center gap-2.5 group cursor-pointer min-w-0">
+                <div class="w-9 h-9 sm:w-10 sm:h-10 bg-gradient-to-tr from-emerald-500 to-cyan-400 rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(16,185,129,0.15)] group-hover:scale-105 transition-transform duration-300 flex-shrink-0">
+                    <i class="fa-solid fa-circle-nodes text-slate-950 text-base sm:text-xl"></i>
                 </div>
-                <span class="text-xl font-bold tracking-tight bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">SmashMatch</span>
+                <span class="text-lg sm:text-xl font-bold tracking-tight bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 bg-clip-text text-transparent truncate">SmashMatch</span>
             </div>
             
-            <!-- Active Indicator & Logout Container Row -->
-            <div class="flex items-center gap-3">
-                <span class="text-xs text-slate-400 bg-slate-800 border border-slate-700/60 px-3 py-1.5 rounded-full hidden sm:flex items-center gap-1.5">
-                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Active Player Mode
+            <div class="flex items-center gap-2 sm:gap-4 flex-shrink-0">
+                <span class="text-[10px] sm:text-[11px] font-bold tracking-widest uppercase text-slate-400 bg-slate-900/80 border border-slate-800/80 px-2.5 sm:px-3.5 py-2 rounded-xl hidden xs:flex items-center gap-2 shadow-inner">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Active Admin
                 </span>
-                <button onclick="showLogoutModal()" class="flex items-center justify-center gap-2 border border-rose-500/30 hover:border-rose-500 bg-rose-500/5 hover:bg-rose-500 text-rose-400 hover:text-slate-950 px-4 py-1.5 rounded-xl text-xs font-semibold transition-all shadow-md active:scale-95">
-                    <i class="fa-solid fa-right-from-bracket text-xs"></i>
+                <button onclick="showLogoutModal()" class="flex items-center justify-center gap-1.5 sm:gap-2 border border-rose-500/20 hover:border-rose-500/50 bg-rose-500/5 hover:bg-rose-500 text-rose-400 hover:text-slate-950 px-2.5 xs:px-3 sm:px-4 py-2 rounded-xl text-[11px] sm:text-xs font-bold tracking-wide transition-all shadow-lg active:scale-95">
+                    <i class="fa-solid fa-right-from-bracket text-[10px] sm:text-xs"></i>
                     <span>Logout</span>
                 </button>
             </div>
         </div>
     </header>
 
-    <!-- Main Content Area -->
-    <main class="flex-grow max-w-6xl w-full mx-auto p-4 md:p-6 lg:p-8 z-10">
+    <main class="flex-grow max-w-6xl w-full mx-auto p-4 sm:p-6 lg:p-8 z-10 relative box-border">
         
-        <!-- Welcome banner context block -->
-        <div class="mb-8 mt-2">
-            <h2 class="text-2xl md:text-3xl font-bold tracking-tight text-white flex items-center gap-2.5">
-                Select Badminton Hub
-            </h2>
-            <p class="text-slate-400 text-sm md:text-base mt-1">Pick a court location base camp to access localized player teams and dynamic matchmaking tiers.</p>
+        <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 sm:gap-6 mb-6 sm:mb-10 mt-2 sm:mt-4 pb-6 border-b border-slate-900/60 w-full overflow-hidden">
+            <div class="min-w-0">
+                <h2 class="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-white flex items-center gap-3">
+                    Select Badminton Hub
+                </h2>
+                <p class="text-slate-400/90 text-xs sm:text-sm mt-1.5 sm:mt-2 max-w-xl leading-relaxed font-medium">Pick a court location base camp to access localized player teams, live system registries, and dynamic matchmaking tiers.</p>
+            </div>
+            <div class="flex items-center gap-2 bg-slate-900/40 p-1.5 border border-slate-900 rounded-xl self-start md:self-auto w-full sm:w-auto box-border">
+                <div class="px-2.5 py-1 bg-slate-950/80 rounded-lg border border-slate-800/50 text-center flex-1 sm:flex-none min-w-[80px]">
+                    <p class="text-[8px] sm:text-[9px] font-bold text-slate-500 uppercase tracking-widest">Hubs Loaded</p>
+                    <p id="hubs-counter" class="text-[11px] sm:text-xs font-bold text-cyan-400 mt-0.5">3 Available</p>
+                </div>
+                <div class="px-2.5 py-1 bg-slate-950/80 rounded-lg border border-slate-800/50 text-center flex-1 sm:flex-none min-w-[80px]">
+                    <p class="text-[8px] sm:text-[9px] font-bold text-slate-500 uppercase tracking-widest">Global Density</p>
+                    <p class="text-[11px] sm:text-xs font-bold text-emerald-400 mt-0.5">304 Active</p>
+                </div>
+            </div>
         </div>
 
-        <!-- Static Responsive Club Cards Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div id="club-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 w-full auto-rows-fr">
             
-            <!-- Club 1 -->
-            <div class="bg-slate-800/80 border border-slate-700/50 rounded-2xl p-5 flex flex-col justify-between shadow-xl backdrop-blur-xl relative group hover:border-slate-600 transition-colors">
-                <div>
-                    <div class="flex justify-between items-start mb-4">
-                        <span class="text-xs bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-medium px-2.5 py-1 rounded-md">Premier Hub</span>
-                        <span class="text-xs text-slate-400"><i class="fa-solid fa-user-group text-slate-500 mr-1"></i> 142 active</span>
+            <div onclick="showAddClubModal()" class="bg-slate-950/20 hover:bg-slate-900/30 border-2 border-dashed border-slate-800/80 hover:border-emerald-500/40 rounded-[1.5rem] sm:rounded-[2rem] p-5 sm:p-6 flex flex-col items-center justify-center min-h-[280px] text-center cursor-pointer transition-all duration-300 group relative overflow-hidden shadow-xl active:scale-[0.99] w-full box-border order-first">
+                <div class="absolute inset-0 bg-gradient-to-b from-emerald-500/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div class="w-12 h-12 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center mb-4 group-hover:scale-110 group-hover:border-emerald-500/30 group-hover:bg-slate-950 transition-all duration-300 shadow-inner">
+                    <i class="fa-solid fa-plus text-slate-400 group-hover:text-emerald-400 text-lg transition-colors"></i>
+                </div>
+                <h3 class="text-sm sm:text-base font-bold text-slate-300 group-hover:text-white transition-colors tracking-tight">Register New Court Hub</h3>
+                <p class="text-slate-500 text-[11px] sm:text-xs font-medium max-w-[200px] mt-1.5 leading-relaxed">Expand the matchmaking reach matrix by binding a local arena framework.</p>
+            </div>
+
+            <div class="bg-gradient-to-b from-slate-900/60 to-slate-900/20 border border-slate-800/80 rounded-[1.5rem] sm:rounded-[2rem] p-4 sm:p-6 flex flex-col justify-between shadow-2xl backdrop-blur-2xl relative group hover:border-slate-700/40 transition-all duration-300 min-h-[280px] w-full box-border min-w-0">
+                <div class="min-w-0">
+                    <div class="flex items-center justify-between gap-2 mb-4 sm:mb-5 w-full">
+                        <span class="text-[9px] sm:text-[10px] bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-bold uppercase tracking-widest px-2 py-0.5 rounded-md flex-shrink-0">Premier Hub</span>
+                        <span class="text-[10px] sm:text-xs font-semibold text-slate-400 bg-slate-950/40 border border-slate-900 px-2 py-0.5 rounded-lg flex items-center min-w-0 truncate"><i class="fa-solid fa-user-group text-emerald-500 mr-1 sm:mr-1.5 flex-shrink-0"></i>142 active</span>
                     </div>
-                    <h3 class="text-lg font-semibold text-white tracking-tight mb-1">Apex Badminton Arena</h3>
-                    <p class="text-slate-400 text-xs flex items-center gap-1 mb-4">
-                        <i class="fa-solid fa-location-dot text-slate-500"></i> Downtown Sports District, Court 1-12
+                    <h3 class="text-base sm:text-lg font-bold text-white tracking-tight mb-1 group-hover:text-emerald-400 transition-colors duration-200 truncate">Apex Badminton Arena</h3>
+                    <p class="text-slate-400/80 text-[11px] sm:text-xs font-medium flex items-center gap-2 mb-4 sm:mb-5 min-w-0 w-full">
+                        <i class="fa-solid fa-location-dot text-slate-600 flex-shrink-0"></i> 
+                        <span class="truncate block">Downtown Sports District, Court 1-12</span>
                     </p>
-                    <div class="flex flex-wrap gap-1.5 mb-6">
-                        <span class="text-[11px] bg-slate-900/60 text-slate-300 px-2.5 py-1 rounded-md">Pro Flooring</span>
-                        <span class="text-[11px] bg-slate-900/60 text-slate-300 px-2.5 py-1 rounded-md">Air Conditioned</span>
-                        <span class="text-[11px] bg-slate-900/60 text-slate-300 px-2.5 py-1 rounded-md">Pro Shop</span>
+                    <div class="flex flex-wrap gap-1 sm:gap-1.5 mb-5 sm:mb-6">
+                        <span class="text-[10px] sm:text-[11px] font-medium bg-slate-950/50 border border-slate-900/60 text-slate-300 px-2 py-0.5 rounded-lg">Pro Flooring</span>
+                        <span class="text-[10px] sm:text-[11px] font-medium bg-slate-950/50 border border-slate-900/60 text-slate-300 px-2 py-0.5 rounded-lg">Air Co.</span>
+                        <span class="text-[10px] sm:text-[11px] font-medium bg-slate-950/50 border border-slate-900/60 text-slate-300 px-2 py-0.5 rounded-lg">Pro Shop</span>
                     </div>
                 </div>
-                <button onclick="selectClub(this, 'Apex Badminton Arena')" class="use-club-btn w-full bg-slate-900 hover:bg-gradient-to-r hover:from-emerald-500 hover:to-cyan-500 hover:text-slate-950 text-slate-200 font-medium text-sm rounded-xl py-2.5 transition-all flex items-center justify-center gap-2 border border-slate-700 group-hover:border-transparent">
+                <button onclick="selectClub(this, 'Apex Badminton Arena')" class="use-club-btn w-full bg-slate-950/80 hover:bg-gradient-to-r hover:from-emerald-500 hover:via-teal-500 hover:to-cyan-500 hover:text-slate-950 text-slate-300 font-bold text-xs uppercase tracking-wider rounded-xl py-3 sm:py-3.5 transition-all duration-300 flex items-center justify-center gap-2 border border-slate-800/80 shadow-lg group-hover:border-transparent group-hover:shadow-[0_4px_20px_rgba(16,185,129,0.1)] active:scale-[0.98] mt-auto">
                     <span>Use Club</span>
+                    <i class="fa-solid fa-chevron-right text-[10px] opacity-70 group-hover:translate-x-0.5 transition-transform"></i>
                 </button>
             </div>
 
-            <!-- Club 2 -->
-            <div class="bg-slate-800/80 border border-slate-700/50 rounded-2xl p-5 flex flex-col justify-between shadow-xl backdrop-blur-xl relative group hover:border-slate-600 transition-colors">
-                <div>
-                    <div class="flex justify-between items-start mb-4">
-                        <span class="text-xs bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 font-medium px-2.5 py-1 rounded-md">Popular</span>
-                        <span class="text-xs text-slate-400"><i class="fa-solid fa-user-group text-slate-500 mr-1"></i> 98 active</span>
+            <div class="bg-gradient-to-b from-slate-900/60 to-slate-900/20 border border-slate-800/80 rounded-[1.5rem] sm:rounded-[2rem] p-4 sm:p-6 flex flex-col justify-between shadow-2xl backdrop-blur-2xl relative group hover:border-slate-700/40 transition-all duration-300 min-h-[280px] w-full box-border min-w-0">
+                <div class="min-w-0">
+                    <div class="flex items-center justify-between gap-2 mb-4 sm:mb-5 w-full">
+                        <span class="text-[9px] sm:text-[10px] bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 font-bold uppercase tracking-widest px-2 py-0.5 rounded-md flex-shrink-0">Popular</span>
+                        <span class="text-[10px] sm:text-xs font-semibold text-slate-400 bg-slate-950/40 border border-slate-900 px-2 py-0.5 rounded-lg flex items-center min-w-0 truncate"><i class="fa-solid fa-user-group text-cyan-400 mr-1 sm:mr-1.5 flex-shrink-0"></i>98 active</span>
                     </div>
-                    <h3 class="text-lg font-semibold text-white tracking-tight mb-1">Shuttle Masters Complex</h3>
-                    <p class="text-slate-400 text-xs flex items-center gap-1 mb-4">
-                        <i class="fa-solid fa-location-dot text-slate-500"></i> Metro Sports Park, Block B
+                    <h3 class="text-base sm:text-lg font-bold text-white tracking-tight mb-1 group-hover:text-cyan-400 transition-colors duration-200 truncate">Shuttle Masters Complex</h3>
+                    <p class="text-slate-400/80 text-[11px] sm:text-xs font-medium flex items-center gap-2 mb-4 sm:mb-5 min-w-0 w-full">
+                        <i class="fa-solid fa-location-dot text-slate-600 flex-shrink-0"></i> 
+                        <span class="truncate block">Metro Sports Park, Block B</span>
                     </p>
-                    <div class="flex flex-wrap gap-1.5 mb-6">
-                        <span class="text-[11px] bg-slate-900/60 text-slate-300 px-2.5 py-1 rounded-md">Rubber Mats</span>
-                        <span class="text-[11px] bg-slate-900/60 text-slate-300 px-2.5 py-1 rounded-md">Locker Rooms</span>
+                    <div class="flex flex-wrap gap-1 sm:gap-1.5 mb-5 sm:mb-6">
+                        <span class="text-[10px] sm:text-[11px] font-medium bg-slate-950/50 border border-slate-900/60 text-slate-300 px-2 py-0.5 rounded-lg">Rubber Mats</span>
+                        <span class="text-[10px] sm:text-[11px] font-medium bg-slate-950/50 border border-slate-900/60 text-slate-300 px-2 py-0.5 rounded-lg">Lockers</span>
                     </div>
                 </div>
-                <button onclick="selectClub(this, 'Shuttle Masters Complex')" class="use-club-btn w-full bg-slate-900 hover:bg-gradient-to-r hover:from-emerald-500 hover:to-cyan-500 hover:text-slate-950 text-slate-200 font-medium text-sm rounded-xl py-2.5 transition-all flex items-center justify-center gap-2 border border-slate-700 group-hover:border-transparent">
+                <button onclick="selectClub(this, 'Shuttle Masters Complex')" class="use-club-btn w-full bg-slate-950/80 hover:bg-gradient-to-r hover:from-emerald-500 hover:via-teal-500 hover:to-cyan-500 hover:text-slate-950 text-slate-300 font-bold text-xs uppercase tracking-wider rounded-xl py-3 sm:py-3.5 transition-all duration-300 flex items-center justify-center gap-2 border border-slate-800/80 shadow-lg group-hover:border-transparent group-hover:shadow-[0_4px_20px_rgba(16,185,129,0.1)] active:scale-[0.98] mt-auto">
                     <span>Use Club</span>
+                    <i class="fa-solid fa-chevron-right text-[10px] opacity-70 group-hover:translate-x-0.5 transition-transform"></i>
                 </button>
             </div>
 
-            <!-- Club 3 -->
-            <div class="bg-slate-800/80 border border-slate-700/50 rounded-2xl p-5 flex flex-col justify-between shadow-xl backdrop-blur-xl relative group hover:border-slate-600 transition-colors">
-                <div>
-                    <div class="flex justify-between items-start mb-4">
-                        <span class="text-xs bg-slate-700/30 border border-slate-600/30 text-slate-400 font-medium px-2.5 py-1 rounded-md">Community</span>
-                        <span class="text-xs text-slate-400"><i class="fa-solid fa-user-group text-slate-500 mr-1"></i> 64 active</span>
+            <div class="bg-gradient-to-b from-slate-900/60 to-slate-900/20 border border-slate-800/80 rounded-[1.5rem] sm:rounded-[2rem] p-4 sm:p-6 flex flex-col justify-between shadow-2xl backdrop-blur-2xl relative group hover:border-slate-700/40 transition-all duration-300 min-h-[280px] w-full box-border min-w-0">
+                <div class="min-w-0">
+                    <div class="flex items-center justify-between gap-2 mb-4 sm:mb-5 w-full">
+                        <span class="text-[9px] sm:text-[10px] bg-slate-800 border border-slate-700 text-slate-400 font-bold uppercase tracking-widest px-2 py-0.5 rounded-md flex-shrink-0">Community</span>
+                        <span class="text-[10px] sm:text-xs font-semibold text-slate-400 bg-slate-950/40 border border-slate-900 px-2 py-0.5 rounded-lg flex items-center min-w-0 truncate"><i class="fa-solid fa-user-group text-slate-500 mr-1 sm:mr-1.5 flex-shrink-0"></i>64 active</span>
                     </div>
-                    <h3 class="text-lg font-semibold text-white tracking-tight mb-1">Vanguard Court Club</h3>
-                    <p class="text-slate-400 text-xs flex items-center gap-1 mb-4">
-                        <i class="fa-solid fa-location-dot text-slate-500"></i> Northside Athletic Pavilion
+                    <h3 class="text-base sm:text-lg font-bold text-white tracking-tight mb-1 group-hover:text-slate-400 transition-colors duration-200 truncate">Vanguard Court Club</h3>
+                    <p class="text-slate-400/80 text-[11px] sm:text-xs font-medium flex items-center gap-2 mb-4 sm:mb-5 min-w-0 w-full">
+                        <i class="fa-solid fa-location-dot text-slate-600 flex-shrink-0"></i> 
+                        <span class="truncate block">Northside Athletic Pavilion</span>
                     </p>
-                    <div class="flex flex-wrap gap-1.5 mb-6">
-                        <span class="text-[11px] bg-slate-900/60 text-slate-300 px-2.5 py-1 rounded-md">Wood Floors</span>
-                        <span class="text-[11px] bg-slate-900/60 text-slate-300 px-2.5 py-1 rounded-md">Free Parking</span>
+                    <div class="flex flex-wrap gap-1 sm:gap-1.5 mb-5 sm:mb-6">
+                        <span class="text-[10px] sm:text-[11px] font-medium bg-slate-950/50 border border-slate-900/60 text-slate-300 px-2 py-0.5 rounded-lg">Wood Floors</span>
+                        <span class="text-[10px] sm:text-[11px] font-medium bg-slate-950/50 border border-slate-900/60 text-slate-300 px-2 py-0.5 rounded-lg">Free Park</span>
                     </div>
                 </div>
-                <button onclick="selectClub(this, 'Vanguard Court Club')" class="use-club-btn w-full bg-slate-900 hover:bg-gradient-to-r hover:from-emerald-500 hover:to-cyan-500 hover:text-slate-950 text-slate-200 font-medium text-sm rounded-xl py-2.5 transition-all flex items-center justify-center gap-2 border border-slate-700 group-hover:border-transparent">
+                <button onclick="selectClub(this, 'Vanguard Court Club')" class="use-club-btn w-full bg-slate-950/80 hover:bg-gradient-to-r hover:from-emerald-500 hover:via-teal-500 hover:to-cyan-500 hover:text-slate-950 text-slate-300 font-bold text-xs uppercase tracking-wider rounded-xl py-3 sm:py-3.5 transition-all duration-300 flex items-center justify-center gap-2 border border-slate-800/80 shadow-lg group-hover:border-transparent group-hover:shadow-[0_4px_20px_rgba(16,185,129,0.1)] active:scale-[0.98] mt-auto">
                     <span>Use Club</span>
+                    <i class="fa-solid fa-chevron-right text-[10px] opacity-70 group-hover:translate-x-0.5 transition-transform"></i>
                 </button>
             </div>
 
         </div>
     </main>
 
-    <!-- CENTERED MODAL SYSTEM -->
+    <div id="add-club-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-slate-950/60 backdrop-blur-md transition-opacity duration-300" onclick="hideAddClubModal()"></div>
+        <div class="bg-gradient-to-b from-slate-900 to-slate-950 border border-slate-800/80 text-white rounded-[1.5rem] sm:rounded-[2rem] max-w-md w-full p-5 sm:p-8 shadow-2xl relative z-10 transform scale-95 opacity-0 modal-transition" id="add-club-card">
+            <h3 class="text-lg sm:text-xl font-bold text-white tracking-tight mb-1">Register New Arena Hub</h3>
+            <p class="text-slate-400 text-[11px] sm:text-xs font-medium mb-5 sm:mb-6">Input local base configurations to launch structural matching maps.</p>
+            
+            <form id="add-club-form" onsubmit="handleClubSubmission(event)" class="space-y-4">
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Arena Name</label>
+                    <input type="text" id="modal-club-name" required placeholder="e.g., Grand Court Center" class="w-full bg-slate-950/60 border border-slate-800/80 rounded-xl py-2.5 sm:py-3 px-4 text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500/50 focus:ring-4 focus:ring-emerald-500/10 text-xs font-medium tracking-wide">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Physical Address Location</label>
+                    <input type="text" id="modal-club-address" required placeholder="e.g., 404 Court Boulevard, Block D" class="w-full bg-slate-950/60 border border-slate-800/80 rounded-xl py-2.5 sm:py-3 px-4 text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500/50 focus:ring-4 focus:ring-emerald-500/10 text-xs font-medium tracking-wide">
+                </div>
+                <div class="flex items-center gap-3 pt-2 sm:pt-4">
+                    <button type="button" onclick="hideAddClubModal()" class="w-1/2 bg-slate-950/80 hover:bg-slate-900 border border-slate-800/80 text-slate-300 text-xs font-bold uppercase tracking-wider rounded-xl py-3.5 transition-colors duration-200">
+                        Cancel
+                    </button>
+                    <button type="submit" class="w-1/2 bg-gradient-to-r from-emerald-500 to-cyan-500 text-slate-950 text-xs font-bold uppercase tracking-wider rounded-xl py-3.5 shadow-lg shadow-emerald-500/15 transition-all active:scale-95">
+                        Deploy Hub
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <div id="logout-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
-        <!-- Backdrop Blur overlay -->
-        <div class="absolute inset-0 bg-slate-950/60 backdrop-blur-sm transition-opacity" onclick="hideLogoutModal()"></div>
-        
-        <!-- Modal Card Center Box -->
-        <div class="bg-slate-800 border border-slate-700 text-white rounded-2xl max-w-md w-full p-6 shadow-2xl relative z-10 transform scale-95 opacity-0 transition-all duration-300 ease-out" id="modal-card">
-            <div class="w-12 h-12 bg-rose-500/10 border border-rose-500/20 text-rose-400 rounded-full flex items-center justify-center text-xl mb-4 mx-auto">
+        <div class="absolute inset-0 bg-slate-950/60 backdrop-blur-md transition-opacity duration-300" onclick="hideLogoutModal()"></div>
+        <div class="bg-gradient-to-b from-slate-900 to-slate-950 border border-slate-800/80 text-white rounded-[1.5rem] sm:rounded-[2rem] max-w-md w-full p-5 sm:p-8 shadow-2xl relative z-10 transform scale-95 opacity-0 modal-transition" id="modal-card">
+            <div class="w-11 h-11 sm:w-12 sm:h-12 bg-rose-500/10 border border-rose-500/20 text-rose-400 rounded-2xl flex items-center justify-center text-lg sm:text-xl mb-4 mx-auto shadow-lg shadow-rose-500/5">
                 <i class="fa-solid fa-right-from-bracket"></i>
             </div>
-            <h3 class="text-lg font-bold text-center text-white tracking-tight">Sign Out Confirmation</h3>
-            <p class="text-slate-400 text-sm text-center mt-2">Are you sure you want to log out of the SmashMatch engine? Any unsaved staging profiles may be discarded.</p>
+            <h3 class="text-lg sm:text-xl font-bold text-center text-white tracking-tight">Sign Out Confirmation</h3>
+            <p class="text-slate-400/90 text-xs sm:text-sm text-center mt-2.5 sm:mt-3 leading-relaxed font-medium">Are you sure you want to log out of the SmashMatch engine? Unsaved local staging profiles will be lost.</p>
             
-            <div class="flex items-center gap-3 mt-6">
-                <button onclick="hideLogoutModal()" class="w-1/2 bg-slate-700 hover:bg-slate-650 border border-slate-600 text-slate-200 text-sm font-medium rounded-xl py-2.5 transition-all">
+            <div class="flex items-center gap-3 mt-6 sm:mt-8">
+                <button onclick="hideLogoutModal()" class="w-1/2 bg-slate-950/80 hover:bg-slate-900 border border-slate-800/80 text-slate-300 text-xs font-bold uppercase tracking-wider rounded-xl py-3.5 transition-colors duration-200">
                     Cancel
                 </button>
-                <button onclick="confirmLogout()" class="w-1/2 bg-rose-500 hover:bg-rose-600 text-slate-950 text-sm font-semibold rounded-xl py-2.5 transition-all shadow-md shadow-rose-500/10">
+                <button onclick="confirmLogout()" class="w-1/2 bg-rose-500 hover:bg-rose-600 text-slate-950 text-xs font-bold uppercase tracking-wider rounded-xl py-3.5 transition-colors duration-200 shadow-lg shadow-rose-500/15">
                     Logout
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- Footer System -->
-    <footer class="w-full text-center p-4 border-t border-slate-800/60 bg-slate-950/20 backdrop-blur-md text-xs text-slate-500 z-10">
-        SmashMatch Badminton Matchmaking Engine
+    <footer class="w-full text-center p-5 border-t border-slate-900 bg-slate-950/60 backdrop-blur-md text-[10px] font-bold tracking-widest text-slate-600 uppercase z-10">
+        &copy; SmashMatch Engine Ecosystem
     </footer>
 
-    <!-- Interactive Scripts for Selection Routing & Custom Modals -->
     <script>
+        // Run setup routine on application window completion
+        document.addEventListener('DOMContentLoaded', () => {
+            renderStoredClubs();
+        });
+
         function selectClub(btnElement, clubName) {
             const allButtons = document.querySelectorAll('.use-club-btn');
             allButtons.forEach(btn => btn.disabled = true);
 
-            btnElement.classList.remove('bg-slate-900', 'text-slate-200', 'hover:from-emerald-500', 'hover:to-cyan-500', 'hover:text-slate-950');
-            btnElement.classList.add('bg-gradient-to-r', 'from-emerald-500', 'to-cyan-500', 'text-slate-950', 'opacity-90');
+            btnElement.classList.remove('bg-slate-950/80', 'text-slate-300', 'hover:from-emerald-500', 'hover:to-cyan-500', 'hover:text-slate-950', 'border-slate-800/80');
+            btnElement.classList.add('bg-gradient-to-r', 'from-emerald-500', 'to-cyan-400', 'text-slate-950', 'border-transparent');
             
             btnElement.innerHTML = `
-                <span>Connecting to Hub</span>
-                <i class="fa-solid fa-circle-notch text-sm animate-spin"></i>
+                <span>Connecting Framework</span>
+                <i class="fa-solid fa-circle-notch text-xs animate-spin ml-1"></i>
             `;
 
             setTimeout(() => {
@@ -179,33 +233,113 @@
                 setTimeout(() => {
                     window.location.href = './teams.html';
                 }, 700);
-            }, 1000);
+            }, 1100);
         }
 
-        // Custom Modal UI Logic 
-        function showLogoutModal() {
-            const modal = document.getElementById('logout-modal');
-            const card = document.getElementById('modal-card');
+        // Logic framework for processing custom additions dynamically
+        function handleClubSubmission(event) {
+            event.preventDefault();
             
+            const nameInput = document.getElementById('modal-club-name');
+            const addressInput = document.getElementById('modal-club-address');
+            
+            const newClub = {
+                id: 'club-' + Date.now(),
+                name: nameInput.value.trim(),
+                address: addressInput.value.trim()
+            };
+
+            // Grab existing storage registry array or spin up empty framework
+            const existingClubs = JSON.parse(localStorage.getItem('smashmatch_custom_hubs')) || [];
+            existingClubs.push(newClub);
+            localStorage.setItem('smashmatch_custom_hubs', JSON.stringify(existingClubs));
+
+            // Run rendering routine and clean up view elements
+            renderStoredClubs();
+            document.getElementById('add-club-form').reset();
+            hideAddClubModal();
+        }
+
+        function renderStoredClubs() {
+            // Remove any dynamically loaded cards to prevent duplication matrices
+            const structuralCards = document.querySelectorAll('.custom-dynamic-card');
+            structuralCards.forEach(card => card.remove());
+
+            const storedClubs = JSON.parse(localStorage.getItem('smashmatch_custom_hubs')) || [];
+            const gridContainer = document.getElementById('club-grid');
+
+            storedClubs.forEach(club => {
+                const cardMarkup = document.createElement('div');
+                cardMarkup.className = "custom-dynamic-card bg-gradient-to-b from-slate-900/60 to-slate-900/20 border border-slate-800/80 rounded-[1.5rem] sm:rounded-[2rem] p-4 sm:p-6 flex flex-col justify-between shadow-2xl backdrop-blur-2xl relative group hover:border-slate-700/40 transition-all duration-300 min-h-[280px] w-full box-border min-w-0 animate-fade-in";
+                cardMarkup.innerHTML = `
+                    <div class="min-w-0">
+                        <div class="flex items-center justify-between gap-2 mb-4 sm:mb-5 w-full">
+                            <span class="text-[9px] sm:text-[10px] bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 font-bold uppercase tracking-widest px-2 py-0.5 rounded-md flex-shrink-0">Custom Hub</span>
+                            <span class="text-[10px] sm:text-xs font-semibold text-slate-400 bg-slate-950/40 border border-slate-900 px-2 py-0.5 rounded-lg flex items-center min-w-0 truncate"><i class="fa-solid fa-user-group text-cyan-400 mr-1 sm:mr-1.5 flex-shrink-0"></i>Local Node</span>
+                        </div>
+                        <h3 class="text-base sm:text-lg font-bold text-white tracking-tight mb-1 group-hover:text-cyan-400 transition-colors duration-200 truncate">${escapeHtml(club.name)}</h3>
+                        <p class="text-slate-400/80 text-[11px] sm:text-xs font-medium flex items-center gap-2 mb-4 sm:mb-5 min-w-0 w-full">
+                            <i class="fa-solid fa-location-dot text-slate-600 flex-shrink-0"></i> 
+                            <span class="truncate block">${escapeHtml(club.address)}</span>
+                        </p>
+                        <div class="flex flex-wrap gap-1 sm:gap-1.5 mb-5 sm:mb-6">
+                            <span class="text-[10px] sm:text-[11px] font-medium bg-slate-950/50 border border-slate-900/60 text-slate-300 px-2 py-0.5 rounded-lg">Staged Hub</span>
+                        </div>
+                    </div>
+                    <button onclick="selectClub(this, '${escapeHtml(club.name)}')" class="use-club-btn w-full bg-slate-950/80 hover:bg-gradient-to-r hover:from-emerald-500 hover:via-teal-500 hover:to-cyan-500 hover:text-slate-950 text-slate-300 font-bold text-xs uppercase tracking-wider rounded-xl py-3 sm:py-3.5 transition-all duration-300 flex items-center justify-center gap-2 border border-slate-800/80 shadow-lg group-hover:border-transparent group-hover:shadow-[0_4px_20px_rgba(16,185,129,0.1)] active:scale-[0.98] mt-auto">
+                        <span>Use Club</span>
+                        <i class="fa-solid fa-chevron-right text-[10px] opacity-70 group-hover:translate-x-0.5 transition-transform"></i>
+                    </button>
+                `;
+                gridContainer.appendChild(cardMarkup);
+            });
+
+            // Keep header performance stats metric synced
+            const dynamicTotal = 3 + storedClubs.length;
+            document.getElementById('hubs-counter').innerText = `${dynamicTotal} Available`;
+        }
+
+        // Escape helper system protecting data layouts from XSS breaking
+        function escapeHtml(str) {
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
+
+        // Add Club Registry Modal Dynamic Animations Handling
+        function showAddClubModal() {
+            const modal = document.getElementById('add-club-modal');
+            const card = document.getElementById('add-club-card');
             modal.classList.remove('hidden');
-            // Allow display change to trigger, then apply transitions
             setTimeout(() => {
                 card.classList.remove('scale-95', 'opacity-0');
                 card.classList.add('scale-100', 'opacity-100');
-            }, 10);
+            }, 20);
+        }
+
+        function hideAddClubModal() {
+            const card = document.getElementById('add-club-card');
+            const modal = document.getElementById('add-club-modal');
+            card.classList.remove('scale-100', 'opacity-100');
+            card.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => { modal.classList.add('hidden'); }, 400);
+        }
+
+        // Custom Modal UI Logout Logic Transitions Engine 
+        function showLogoutModal() {
+            const modal = document.getElementById('logout-modal');
+            const card = document.getElementById('modal-card');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                card.classList.remove('scale-95', 'opacity-0');
+                card.classList.add('scale-100', 'opacity-100');
+            }, 20);
         }
 
         function hideLogoutModal() {
             const card = document.getElementById('modal-card');
             const modal = document.getElementById('logout-modal');
-            
             card.classList.remove('scale-100', 'opacity-100');
             card.classList.add('scale-95', 'opacity-0');
-            
-            // Wait for transition animation to end before adding hidden back
-            setTimeout(() => {
-                modal.classList.add('hidden');
-            }, 300);
+            setTimeout(() => { modal.classList.add('hidden'); }, 400);
         }
 
         function confirmLogout() {
@@ -215,7 +349,7 @@
                 setTimeout(() => {
                     window.location.href = '../index.html';
                 }, 700);
-            }, 200);
+            }, 250);
         }
     </script>
 </body>

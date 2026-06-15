@@ -4,8 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SmashMatch - Admin Panel</title>
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght=300;400;500;600;700&display=swap" rel="stylesheet">
@@ -13,39 +16,43 @@
     <style>
         body { font-family: 'Poppins', sans-serif; }
         .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.6); border-radius: 8px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(51, 65, 85, 0.8); border-radius: 8px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(71, 85, 105, 1); }
+        .custom-scrollbar::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.4); border-radius: 8px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(51, 65, 85, 0.6); border-radius: 8px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(16, 185, 129, 0.5); }
+        .modal-transition { transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
     </style>
 </head>
-<body class="bg-slate-900 text-white min-h-screen flex flex-col justify-between antialiased selection:bg-emerald-500 selection:text-slate-900 relative transition-opacity duration-700 ease-in-out" id="body-overlay">
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between antialiased selection:bg-emerald-500 selection:text-slate-900 relative overflow-x-hidden transition-opacity duration-700 ease-in-out" id="body-overlay">
 
-    <div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0 opacity-10">
-        <div class="absolute -top-40 left-10 w-96 h-96 bg-emerald-500 rounded-full filter blur-3xl"></div>
-        <div class="absolute bottom-10 right-10 w-96 h-96 bg-cyan-500 rounded-full filter blur-3xl"></div>
+    <!-- Ambient Digital Canvas Lattice -->
+    <div class="absolute inset-0 bg-[linear-gradient(to_right,#0f172a_1px,transparent_1px),linear-gradient(to_bottom,#0f172a_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] z-0 opacity-35"></div>
+    <div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0 opacity-20">
+        <div class="absolute -top-40 left-10 w-[30rem] h-[30rem] bg-emerald-500/15 rounded-full filter blur-[120px]"></div>
+        <div class="absolute bottom-10 right-10 w-[30rem] h-[30rem] bg-cyan-500/15 rounded-full filter blur-[120px]"></div>
     </div>
 
-    <header class="w-full border-b border-slate-800/80 bg-slate-950/40 backdrop-blur-md z-10 px-4 py-4">
+    <!-- Header Navigation Section -->
+    <header class="w-full border-b border-slate-900 bg-slate-950/60 backdrop-blur-md z-10 px-4 py-4">
         <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
             
             <div class="flex items-center gap-4">
-                <button onclick="navigateBack()" class="flex items-center justify-center gap-2 bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 text-slate-300 hover:text-white px-3 py-1.5 rounded-xl text-xs transition-all font-medium active:scale-95">
-                    <i class="fa-solid fa-arrow-left"></i>
+                <button onclick="navigateBack()" class="flex items-center justify-center gap-2 bg-slate-900/80 hover:bg-slate-900 border border-slate-800 text-slate-400 hover:text-white px-4 py-2 rounded-xl text-xs transition-all font-bold tracking-wide active:scale-95 shadow-md">
+                    <i class="fa-solid fa-arrow-left text-[10px]"></i>
                     <span class="hidden sm:inline">Back</span>
                 </button>
-                <div class="flex items-center gap-2">
-                    <div class="w-9 h-9 bg-gradient-to-tr from-emerald-500 to-cyan-400 rounded-xl flex items-center justify-center shadow-md">
-                        <i class="fa-solid fa-shuttlecock text-slate-950 text-lg"></i>
+                <div class="flex items-center gap-2.5 group cursor-pointer">
+                    <div class="w-9 h-9 bg-gradient-to-tr from-emerald-500 to-cyan-400 rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(16,185,129,0.15)]">
+                        <i class="fa-solid fa-circle-nodes text-slate-950 text-lg"></i>
                     </div>
-                    <span class="text-xl font-bold tracking-tight bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent hidden xs:inline">SmashMatch</span>
+                    <span class="text-xl font-bold tracking-tight bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 bg-clip-text text-transparent hidden xs:inline">SmashMatch</span>
                 </div>
             </div>
 
             <div class="flex items-center gap-3">
-                <span class="text-xs text-slate-400 bg-slate-800/40 border border-slate-700/40 px-3 py-1.5 rounded-full hidden md:flex items-center gap-1.5">
+                <span class="text-[11px] font-bold tracking-widest uppercase text-slate-400 bg-slate-900/60 border border-slate-800/80 px-3.5 py-2 rounded-xl hidden md:flex items-center gap-2 shadow-inner">
                     <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span> Admin Console
                 </span>
-                <button onclick="showLogoutModal()" class="flex items-center justify-center gap-2 border border-rose-500/30 hover:border-rose-500 bg-rose-500/5 hover:bg-rose-500 text-rose-400 hover:text-slate-950 px-4 py-1.5 rounded-xl text-xs font-semibold transition-all shadow-md active:scale-95">
+                <button onclick="showLogoutModal()" class="flex items-center justify-center gap-2 border border-rose-500/20 hover:border-rose-500/50 bg-rose-500/5 hover:bg-rose-500 text-rose-400 hover:text-slate-950 px-4 py-2 rounded-xl text-xs font-bold tracking-wide transition-all shadow-lg active:scale-95">
                     <i class="fa-solid fa-right-from-bracket text-xs"></i>
                     <span>Logout</span>
                 </button>
@@ -54,107 +61,121 @@
         </div>
     </header>
 
-    <main class="flex-grow max-w-7xl w-full mx-auto p-4 md:p-6 lg:p-8 z-10 grid grid-cols-1 lg:grid-cols-12 gap-8">
+    <!-- Main Content Workstation Area -->
+    <main class="flex-grow max-w-7xl w-full mx-auto p-4 md:p-6 lg:p-8 z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 relative">
         
-        <section class="lg:col-span-5 space-y-6">
-            <div class="mb-2">
-                <h2 class="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
-                    Configuration Deck
-                </h2>
-                <p class="text-slate-400 text-sm mt-1">Register teams and assemble individual player profiles with distinctive rank attributes.</p>
-            </div>
+        <!-- LEFT CONFIGURATION DECK PANEL -->
+        <section class="lg:col-span-5 space-y-6 flex flex-col justify-between">
+            <div class="space-y-6">
+                <div class="pb-4 border-b border-slate-900/60">
+                    <h2 class="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
+                        Configuration Deck
+                    </h2>
+                    <p class="text-slate-400 text-xs sm:text-sm mt-1.5 leading-relaxed font-medium">Register corporate teams and assemble individual player profiles with distinctive rank matrices.</p>
+                </div>
 
-            <div class="bg-slate-800/80 border border-slate-700/50 rounded-2xl p-6 shadow-xl backdrop-blur-xl">
-                <h3 class="text-sm font-semibold uppercase tracking-wider text-slate-400 mb-5"><i class="fa-solid fa-plus-circle text-emerald-400 mr-2"></i>Create New Team</h3>
-                
-                <div class="space-y-5">
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Team Name</label>
-                        <input type="text" id="team-name" class="w-full bg-slate-900/60 border border-slate-700 rounded-xl py-3 px-4 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all text-sm" placeholder="e.g., Smasher Knights">
-                    </div>
+                <!-- Interactive Creator Deck Card -->
+                <div class="bg-gradient-to-b from-slate-900/60 to-slate-900/20 border border-slate-800/80 rounded-[2rem] p-6 shadow-2xl backdrop-blur-2xl">
+                    <h3 class="text-xs font-bold uppercase tracking-widest text-slate-400 mb-5 flex items-center gap-2">
+                        <i class="fa-solid fa-circle-plus text-emerald-400 text-sm"></i> Create New Team
+                    </h3>
                     
-                    <div class="border-t border-slate-700/50 my-2 pt-4">
-                        <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Roster Builder (Add Individual Players)</label>
+                    <div class="space-y-5">
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Team Identity Label</label>
+                            <input type="text" id="team-name" class="w-full bg-slate-950/60 border border-slate-800/80 rounded-xl py-3 px-4 text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500/50 focus:ring-4 focus:ring-emerald-500/10 transition-all text-xs font-medium tracking-wide" placeholder="e.g., Smasher Knights">
+                        </div>
                         
-                        <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-center">
-                            <div class="sm:col-span-6">
-                                <input type="text" id="player-name" class="w-full bg-slate-900/60 border border-slate-700 rounded-xl py-2.5 px-4 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition-all text-sm" placeholder="Player Name">
-                            </div>
-                            <div class="sm:col-span-4">
-                                <select id="player-rank" class="w-full bg-slate-900/60 border border-slate-700 rounded-xl py-2.5 px-3 text-slate-300 focus:outline-none focus:border-emerald-500 transition-all text-sm cursor-pointer">
-                                    <option value="Beginner">Beginner</option>
-                                    <option value="Intermediate" selected>Intermediate</option>
-                                    <option value="Advanced">Advanced</option>
-                                </select>
-                            </div>
-                            <div class="sm:col-span-2">
-                                <button type="button" onclick="stagePlayer()" class="w-full bg-slate-700/80 hover:bg-slate-700 border border-slate-600 text-white font-medium rounded-xl py-2.5 transition-all text-sm flex items-center justify-center shadow-sm" title="Add Player to List">
-                                    <i class="fa-solid fa-plus"></i>
-                                </button>
+                        <div class="border-t border-slate-900/80 pt-4 mt-2">
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2.5">Roster Matrix Additions</label>
+                            
+                            <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-center">
+                                <div class="sm:col-span-6">
+                                    <input type="text" id="player-name" class="w-full bg-slate-950/60 border border-slate-800/80 rounded-xl py-3 px-4 text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500/50 focus:ring-4 focus:ring-emerald-500/10 transition-all text-xs font-medium tracking-wide" placeholder="Player Full Identity">
+                                </div>
+                                <div class="sm:col-span-4">
+                                    <select id="player-rank" class="w-full bg-slate-950/60 border border-slate-800/80 rounded-xl py-3 px-3 text-slate-300 focus:outline-none focus:border-emerald-500/50 transition-all text-xs font-semibold tracking-wide cursor-pointer appearance-none">
+                                        <option value="Beginner">Beginner Tier</option>
+                                        <option value="Intermediate" selected>Intermediate Tier</option>
+                                        <option value="Advanced">Advanced Tier</option>
+                                    </select>
+                                </div>
+                                <div class="sm:col-span-2">
+                                    <button type="button" onclick="stagePlayer()" class="w-full bg-slate-950/80 hover:bg-slate-900 border border-slate-800 hover:border-slate-700 text-white font-bold rounded-xl py-3 transition-all flex items-center justify-center shadow-md active:scale-95" title="Stage Competitor Profile">
+                                        <i class="fa-solid fa-plus text-xs"></i>
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div id="staged-players-wrapper" class="hidden bg-slate-900/30 rounded-xl p-3 border border-slate-700/30">
-                        <p class="text-[11px] text-slate-500 uppercase tracking-wider font-semibold mb-2">Players Drafted into Current Team Stack:</p>
-                        <div id="staged-players-list" class="flex flex-wrap gap-2"></div>
-                    </div>
+                        <!-- Draft Staging Area Container -->
+                        <div id="staged-players-wrapper" class="hidden bg-slate-950/40 rounded-2xl p-4 border border-slate-900/80 shadow-inner">
+                            <p class="text-[9px] text-slate-500 uppercase tracking-widest font-bold mb-3">Live Structural Roster Block Draft Stack:</p>
+                            <div id="staged-players-list" class="flex flex-wrap gap-2"></div>
+                        </div>
 
-                    <button onclick="commitFullTeam()" class="w-full mt-2 bg-slate-900 hover:bg-slate-750 text-emerald-400 border border-emerald-500/30 hover:border-emerald-500/60 font-medium rounded-xl py-3 transition-all flex items-center justify-center gap-2 text-sm shadow-inner">
-                        <i class="fa-solid fa-square-plus text-xs"></i>
-                        <span>Add Full Team</span>
-                    </button>
+                        <button onclick="commitFullTeam()" class="w-full bg-slate-950/80 hover:bg-slate-900 text-emerald-400 border border-slate-800/80 hover:border-emerald-500/30 font-bold rounded-xl py-3.5 transition-all flex items-center justify-center gap-2 text-xs uppercase tracking-wider shadow-md">
+                            <i class="fa-solid fa-square-plus text-xs"></i>
+                            <span>Add Team</span>
+                        </button>
+                    </div>
                 </div>
             </div>
 
-            <div class="flex items-center gap-4">
-                <button onclick="clearAllTeams()" class="w-1/3 bg-slate-800 border border-slate-700 text-slate-400 hover:text-white hover:bg-slate-750 font-medium rounded-xl py-3.5 transition-all text-sm flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-trash-can text-xs"></i> Wipe Drafts
+            <!-- Global Configuration Matrix Action Triggers -->
+            <div class="flex flex-col sm:flex-row items-center gap-3 mt-6 lg:mt-0 w-full">
+                <button onclick="clearAllTeams()" class="w-full sm:w-1/3 bg-slate-950/80 hover:bg-slate-900 border border-slate-800 hover:border-rose-500/30 text-slate-400 hover:text-rose-400 font-bold rounded-xl py-3.5 transition-all text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg active:scale-95">
+                    <i class="fa-solid fa-trash-can text-[10px]"></i> 
+                    <span>Wipe Drafts</span>
                 </button>
                 
-                <button onclick="launchMatchmaking(this)" id="submit-roster-btn" class="w-2/3 bg-gradient-to-r from-emerald-500 to-cyan-500 text-slate-950 font-semibold rounded-xl py-3.5 shadow-lg shadow-emerald-500/20 hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
-                    <span>Generate Matches & Open View</span>
-                    <i class="fa-solid fa-play text-xs"></i>
+                <button onclick="launchMatchmaking(this)" id="submit-roster-btn" class="w-full sm:w-2/3 bg-gradient-to-r from-emerald-500 to-cyan-500 text-slate-950 font-bold rounded-xl py-3.5 shadow-xl shadow-emerald-500/10 hover:opacity-95 active:scale-[0.98] transition-all text-xs uppercase tracking-wider flex items-center justify-center gap-2">
+                    <span>Generate Matches</span>
+                    <i class="fa-solid fa-play text-[10px]"></i>
                 </button>
             </div>
         </section>
 
-        <section class="lg:col-span-7 flex flex-col space-y-4">
-            <div class="flex justify-between items-end">
+        <!-- RIGHT TOURNAMENT PREVIEW MATRIX DATABASE -->
+        <section class="lg:col-span-7 flex flex-col min-h-[500px]">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
                 <div>
-                    <h3 class="text-sm font-semibold uppercase tracking-wider text-slate-400 flex items-center">
-                        <i class="fa-solid fa-clipboard-list text-cyan-400 mr-2"></i>Live Tournament Database
+                    <h3 class="text-xs font-bold uppercase tracking-widest text-slate-400 flex items-center gap-2">
+                        <i class="fa-solid fa-database text-cyan-400"></i> Live Tournament Database
                     </h3>
-                    <p class="text-xs text-slate-500 mt-0.5">Real-time breakdown of registered league clubs.</p>
+                    <p class="text-slate-500 text-[11px] mt-0.5 font-medium">Real-time systemic mapping tracking registration arrays.</p>
                 </div>
-                <span id="team-counter" class="text-xs font-semibold bg-slate-950 border border-slate-800 px-3 py-1 rounded-full text-cyan-400">
-                    0 Teams Registered
+                <span id="team-counter" class="text-[11px] font-bold tracking-wider bg-slate-950 border border-slate-800 px-3.5 py-1.5 rounded-xl text-cyan-400 self-start sm:self-auto shadow-inner">
+                    0 Teams Configured
                 </span>
             </div>
 
-            <div class="grid grid-cols-3 gap-3 bg-slate-950/40 border border-slate-800 rounded-xl p-3 text-center">
-                <div>
-                    <div class="text-[10px] uppercase font-semibold text-amber-500 tracking-wider">Beginners</div>
-                    <div id="count-beg" class="text-lg font-bold text-slate-200 mt-0.5">0</div>
+            <!-- Statistical Dynamic Distribution Dashboard Counter Strip -->
+            <div class="grid grid-cols-3 gap-3 bg-slate-950/40 border border-slate-900/80 rounded-2xl p-3 text-center shadow-inner mb-4">
+                <div class="py-1">
+                    <div class="text-[9px] uppercase font-bold text-amber-500 tracking-widest">Beginners</div>
+                    <div id="count-beg" class="text-xl font-bold text-slate-200 mt-1">0</div>
                 </div>
-                <div class="border-x border-slate-800">
-                    <div class="text-[10px] uppercase font-semibold text-emerald-400 tracking-wider">Intermediates</div>
-                    <div id="count-int" class="text-lg font-bold text-slate-200 mt-0.5">0</div>
+                <div class="border-x border-slate-900 py-1">
+                    <div class="text-[9px] uppercase font-bold text-emerald-400 tracking-widest">Intermediates</div>
+                    <div id="count-int" class="text-xl font-bold text-slate-200 mt-1">0</div>
                 </div>
-                <div>
-                    <div class="text-[10px] uppercase font-semibold text-cyan-400 tracking-wider">Advanced</div>
-                    <div id="count-adv" class="text-lg font-bold text-slate-200 mt-0.5">0</div>
+                <div class="py-1">
+                    <div class="text-[9px] uppercase font-bold text-cyan-400 tracking-widest">Advanced</div>
+                    <div id="count-adv" class="text-xl font-bold text-slate-200 mt-1">0</div>
                 </div>
             </div>
 
-            <div id="preview-list" class="flex-grow bg-slate-800/40 border border-slate-800 rounded-2xl p-4 min-h-[380px] lg:h-[450px] overflow-y-auto space-y-3 custom-scrollbar">
+            <!-- Scrollable Registry Frame Matrix Grid Canvas -->
+            <div id="preview-list" class="flex-grow bg-slate-900/20 border border-slate-900/80 rounded-[2rem] p-4 lg:h-[480px] overflow-y-auto space-y-4 custom-scrollbar shadow-2xl relative">
                 
-                <div id="empty-state" class="h-full flex flex-col items-center justify-center text-center p-6">
-                    <div class="w-14 h-14 bg-slate-900 border border-slate-800 rounded-full flex items-center justify-center text-slate-600 mb-3 shadow-inner">
-                        <i class="fa-solid fa-users text-xl"></i>
+                <!-- Zero State Engine Interface Layout -->
+                <div id="empty-state" class="h-full min-h-[350px] flex flex-col items-center justify-center text-center p-6">
+                    <div class="w-14 h-14 bg-slate-950 border border-slate-800 rounded-2xl flex items-center justify-center text-slate-600 mb-4 shadow-inner">
+                        <i class="fa-solid fa-folder-open text-xl"></i>
                     </div>
-                    <h4 class="text-slate-400 text-sm font-medium"> Roster Database Clear</h4>
-                    <p class="text-slate-600 text-xs max-w-[260px] mt-1">Configure and add teams from the control deck to dynamically construct your matchmaking index.</p>
+                    <h4 class="text-slate-400 text-xs font-bold tracking-wide">Roster Architecture Unpopulated</h4>
+                    <p class="text-slate-600 text-xs max-w-[280px] mt-2 leading-relaxed font-medium">Deploy teams through the creation engine nodes to dynamically materialize tracking databases.</p>
                 </div>
 
             </div>
@@ -162,24 +183,30 @@
 
     </main>
 
+    <!-- FLOATING ENGINE RE-USEABLE ACTION MODAL CORE LAYER -->
     <div id="custom-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div class="absolute inset-0 bg-slate-950/60 backdrop-blur-sm transition-opacity" onclick="hideModal()"></div>
+        <div class="absolute inset-0 bg-slate-950/60 backdrop-blur-md transition-opacity" onclick="hideModal()"></div>
         
-        <div class="bg-slate-800 border border-slate-700 text-white rounded-2xl max-w-sm w-full p-6 shadow-2xl relative z-10 transform scale-95 opacity-0 transition-all duration-300 ease-out" id="modal-card">
-            <div id="modal-icon-container" class="w-12 h-12 rounded-full flex items-center justify-center text-xl mb-4 mx-auto">
+        <div class="bg-gradient-to-b from-slate-900 to-slate-950 border border-slate-800 text-white rounded-[2rem] max-w-md w-full p-6 sm:p-8 shadow-2xl relative z-10 transform scale-95 opacity-0 modal-transition" id="modal-card">
+            <div id="modal-icon-container" class="w-12 h-12 rounded-2xl flex items-center justify-center text-xl mb-4 mx-auto shadow-md">
                 <i id="modal-icon" class="fa-solid"></i>
             </div>
             <h3 id="modal-title" class="text-lg font-bold text-center text-white tracking-tight"></h3>
-            <p id="modal-desc" class="text-slate-400 text-sm text-center mt-2"></p>
+            <p id="modal-desc" class="text-slate-400 text-xs text-center mt-3 leading-relaxed font-medium" id="modal-desc-container"></p>
             
-            <div id="modal-actions" class="flex items-center gap-3 mt-6"></div>
+            <!-- Dynamic Injectable Custom Injection Markup Frame Container -->
+            <div id="modal-custom-content" class="mt-4 empty:hidden"></div>
+            
+            <div id="modal-actions" class="flex items-center gap-3 mt-8"></div>
         </div>
     </div>
 
-    <footer class="w-full text-center p-4 border-t border-slate-800/60 bg-slate-950/20 backdrop-blur-md text-xs text-slate-500 z-10">
-        SmashMatch Badminton Matchmaking Engine
+    <!-- Minimalist Branding Footer System -->
+    <footer class="w-full text-center p-5 border-t border-slate-900 bg-slate-950/60 backdrop-blur-md text-[10px] font-bold tracking-widest text-slate-600 uppercase z-10">
+        &copy; SmashMatch Engine Ecosystem
     </footer>
 
+    <!-- Interactive Execution Logic Component Systems -->
     <script>
         let tournamentData = [
             { 
@@ -195,37 +222,38 @@
         ];
 
         let activeFormRoster = [];
+        let currentlyEditingTeamId = null;
+        let editingRosterCache = [];
 
         window.addEventListener('DOMContentLoaded', () => {
             refreshPreviewUI();
         });
 
-        // Navigation Header Buttons Functions
         function navigateBack() {
             document.getElementById('body-overlay').classList.add('opacity-0');
-            setTimeout(() => {
-                window.location.href = 'clubs.html'; 
-            }, 700);
+            setTimeout(() => { window.location.href = 'clubs.html'; }, 700);
         }
 
-        // Custom Modal UI Engine Orchestration
-        function showCustomModal({ title, desc, icon, iconTheme, actions }) {
+        // Custom Dynamic Modal UI Core Framework Controller
+        function showCustomModal({ title, desc, icon, iconTheme, actions, customContent = '' }) {
             const modal = document.getElementById('custom-modal');
             const card = document.getElementById('modal-card');
             const titleEl = document.getElementById('modal-title');
             const descEl = document.getElementById('modal-desc');
             const iconEl = document.getElementById('modal-icon');
             const iconContainer = document.getElementById('modal-icon-container');
+            const contentContainer = document.getElementById('modal-custom-content');
             const actionsContainer = document.getElementById('modal-actions');
 
             titleEl.innerText = title;
-            descEl.innerText = desc;
-            
+            if(desc) { descEl.innerText = desc; descEl.classList.remove('hidden'); } else { descEl.classList.add('hidden'); }
             iconEl.className = `fa-solid ${icon}`;
-            iconContainer.className = `w-12 h-12 rounded-full flex items-center justify-center text-xl mb-4 mx-auto ${iconTheme}`;
+            iconContainer.className = `w-12 h-12 rounded-2xl flex items-center justify-center text-lg mb-4 mx-auto ${iconTheme}`;
             
-            actionsContainer.innerHTML = actions.map((act, index) => `
-                <button onclick="${act.action}" class="w-full text-sm font-medium rounded-xl py-2.5 transition-all ${act.style}">
+            contentContainer.innerHTML = customContent;
+
+            actionsContainer.innerHTML = actions.map(act => `
+                <button onclick="${act.action}" class="w-full text-xs font-bold uppercase tracking-wider rounded-xl py-3.5 transition-colors duration-200 ${act.style}">
                     ${act.text}
                 </button>
             `).join('');
@@ -234,31 +262,26 @@
             setTimeout(() => {
                 card.classList.remove('scale-95', 'opacity-0');
                 card.classList.add('scale-100', 'opacity-100');
-            }, 10);
+            }, 20);
         }
 
         function hideModal() {
             const card = document.getElementById('modal-card');
             const modal = document.getElementById('custom-modal');
-            
             card.classList.remove('scale-100', 'opacity-100');
             card.classList.add('scale-95', 'opacity-0');
-            
-            setTimeout(() => {
-                modal.classList.add('hidden');
-            }, 300);
+            setTimeout(() => { modal.classList.add('hidden'); }, 400);
         }
 
-        // Logout Processing Modal
         function showLogoutModal() {
             showCustomModal({
                 title: 'Sign Out Confirmation',
-                desc: 'Are you sure you want to log out of the administration console? Uncommitted bracket modifications may be lost.',
+                desc: 'Are you sure you want to log out of the administration console? Uncommitted local bracket staging data updates will be dropped.',
                 icon: 'fa-right-from-bracket',
                 iconTheme: 'bg-rose-500/10 border border-rose-500/20 text-rose-400',
                 actions: [
-                    { text: 'Cancel', action: 'hideModal()', style: 'bg-slate-700 hover:bg-slate-650 border border-slate-600 text-slate-200' },
-                    { text: 'Logout', action: 'executeLogout()', style: 'bg-rose-500 hover:bg-rose-600 text-slate-950 font-semibold shadow-md shadow-rose-500/10' }
+                    { text: 'Cancel', action: 'hideModal()', style: 'bg-slate-950/80 hover:bg-slate-900 border border-slate-800 text-slate-300' },
+                    { text: 'Logout', action: 'executeLogout()', style: 'bg-rose-500 hover:bg-rose-600 text-slate-950 shadow-lg shadow-rose-500/15' }
                 ]
             });
         }
@@ -267,44 +290,37 @@
             hideModal();
             setTimeout(() => {
                 document.getElementById('body-overlay').classList.add('opacity-0');
-                setTimeout(() => {
-                    window.location.href = '../index.html'; 
-                }, 700);
+                setTimeout(() => { window.location.href = '../index.html'; }, 700);
             }, 200);
         }
 
-        // Add Player logic block
+        // Add Player To In-Memory Stack Roster
         function stagePlayer() {
             const nameInput = document.getElementById('player-name');
             const rankSelect = document.getElementById('player-rank');
-            
             const nameValue = nameInput.value.trim();
             const rankValue = rankSelect.value;
 
             if (!nameValue) {
                 showCustomModal({
-                    title: 'Invalid Metadata',
-                    desc: 'Please input a valid player identity name string before attempting drafting procedures.',
-                    icon: 'fa-circle-exclamation',
+                    title: 'Invalid Metadata String',
+                    desc: 'Please assign a verified player signature profile label identity prior to finalizing target team injection schemas.',
+                    icon: 'fa-triangle-exclamation',
                     iconTheme: 'bg-amber-500/10 border border-amber-500/20 text-amber-400',
-                    actions: [{ text: 'Acknowledge', action: 'hideModal()', style: 'bg-slate-700 hover:bg-slate-600 text-white' }]
+                    actions: [{ text: 'Acknowledge', action: 'hideModal()', style: 'bg-slate-950/80 hover:bg-slate-900 border border-slate-800 text-slate-200' }]
                 });
                 return;
             }
 
             activeFormRoster.push({ name: nameValue, rank: rankValue });
-
             nameInput.value = "";
             nameInput.focus();
-
             updateStagedFormUI();
         }
 
-        // Monitors individual form item stack displays
         function updateStagedFormUI() {
             const wrapper = document.getElementById('staged-players-wrapper');
             const listContainer = document.getElementById('staged-players-list');
-            
             listContainer.innerHTML = "";
 
             if (activeFormRoster.length === 0) {
@@ -313,13 +329,12 @@
             }
 
             wrapper.classList.remove('hidden');
-
             activeFormRoster.forEach((player, index) => {
                 const tag = document.createElement('span');
-                tag.className = `inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-lg border shadow-sm ${getRankStyle(player.rank)}`;
+                tag.className = `inline-flex items-center gap-2 text-xs font-semibold px-3 py-1.5 rounded-xl border shadow-sm ${getRankStyle(player.rank)}`;
                 tag.innerHTML = `
                     <span>${player.name}</span>
-                    <button type="button" onclick="removeStagedPlayer(${index})" class="text-slate-400 hover:text-white ml-1 font-bold cursor-pointer">×</button>
+                    <button type="button" onclick="removeStagedPlayer(${index})" class="text-slate-400 hover:text-white ml-0.5 font-bold cursor-pointer transition-colors">×</button>
                 `;
                 listContainer.appendChild(tag);
             });
@@ -330,29 +345,29 @@
             updateStagedFormUI();
         }
 
-        // Add Full Team processing functional loop
+        // Commit Team Structural Array Stack to Registry Database
         function commitFullTeam() {
             const teamNameInput = document.getElementById('team-name');
             const teamName = teamNameInput.value.trim();
 
             if (!teamName) {
                 showCustomModal({
-                    title: 'Missing Context',
-                    desc: 'Please assign a structural Team Name label before committing database data records.',
+                    title: 'Context Signature Missing',
+                    desc: 'Assign a valid structural Team Name matrix header label prior to executing full node pipeline insertion workflows.',
                     icon: 'fa-folder-open',
                     iconTheme: 'bg-amber-500/10 border border-amber-500/20 text-amber-400',
-                    actions: [{ text: 'Go Back', action: 'hideModal()', style: 'bg-slate-700 hover:bg-slate-600 text-white' }]
+                    actions: [{ text: 'Go Back', action: 'hideModal()', style: 'bg-slate-950/80 hover:bg-slate-900 border border-slate-800 text-slate-200' }]
                 });
                 return;
             }
 
             if (activeFormRoster.length === 0) {
                 showCustomModal({
-                    title: 'Empty Squad Stack',
-                    desc: 'No players have been compiled yet. Add configuration records using the profile adder section before assigning this team layout.',
+                    title: 'Empty Squad Stack Node',
+                    desc: 'Roster array cannot be clear. Map functional identities using the form builder deck beforehand.',
                     icon: 'fa-user-slash',
                     iconTheme: 'bg-amber-500/10 border border-amber-500/20 text-amber-400',
-                    actions: [{ text: 'Understand', action: 'hideModal()', style: 'bg-slate-700 hover:bg-slate-600 text-white' }]
+                    actions: [{ text: 'Understand', action: 'hideModal()', style: 'bg-slate-950/80 hover:bg-slate-900 border border-slate-800 text-slate-200' }]
                 });
                 return;
             }
@@ -365,46 +380,161 @@
 
             teamNameInput.value = "";
             activeFormRoster = [];
-            
             updateStagedFormUI();
             refreshPreviewUI();
         }
 
-        // Trigger Mid-Screen Delete Confirmation Modal 
-        function deleteTeam(id) {
-            const teamToDelete = tournamentData.find(team => team.id === id);
-            const teamName = teamToDelete ? teamToDelete.name : 'this team';
+        // --- TEAM & PLAYER EDIT CONFIGURATION MODULES ---
+        function openEditTeamModal(id) {
+            const team = tournamentData.find(t => t.id === id);
+            if (!team) return;
+
+            currentlyEditingTeamId = id;
+            editingRosterCache = JSON.parse(JSON.stringify(team.players)); // Deep clone tracking cache
+
+            renderTeamEditInterface(team.name);
+        }
+
+        function renderTeamEditInterface(teamNameValue) {
+            let playerListMarkup = editingRosterCache.map((p, idx) => `
+                <div class="flex items-center gap-2 bg-slate-950 border border-slate-900/60 p-2.5 rounded-xl">
+                    <input type="text" value="${p.name}" onchange="updateEditedPlayerName(${idx}, this.value)" class="flex-grow bg-transparent border-none text-xs text-slate-200 font-medium focus:outline-none placeholder-slate-700" placeholder="Identity Label">
+                    <select onchange="updateEditedPlayerRank(${idx}, this.value)" class="bg-slate-900 border border-slate-800 rounded-lg p-1 text-[11px] font-semibold text-slate-300 focus:outline-none cursor-pointer">
+                        <option value="Beginner" ${p.rank === 'Beginner' ? 'selected' : ''}>Beginner</option>
+                        <option value="Intermediate" ${p.rank === 'Intermediate' ? 'selected' : ''}>Intermediate</option>
+                        <option value="Advanced" ${p.rank === 'Advanced' ? 'selected' : ''}>Advanced</option>
+                    </select>
+                    <button onclick="removePlayerFromEditCache(${idx})" class="text-slate-500 hover:text-rose-400 p-1 transition-colors">
+                        <i class="fa-solid fa-xmark text-xs"></i>
+                    </button>
+                </div>
+            `).join('');
+
+            const interfaceContent = `
+                <div class="space-y-4 max-h-[380px] overflow-y-auto px-1 custom-scrollbar">
+                    <div>
+                        <label class="block text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Modify Team Identifier</label>
+                        <input type="text" id="edit-team-name-input" value="${teamNameValue}" class="w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 px-4 text-white text-xs font-semibold focus:outline-none focus:border-cyan-500/50 transition-all">
+                    </div>
+                    
+                    <div class="border-t border-slate-800 pt-3">
+                        <label class="block text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-2">Configure Competitors Grid</label>
+                        <div class="space-y-2 mb-3">
+                            ${playerListMarkup || '<p class="text-[11px] text-slate-600 font-medium py-2 italic text-center">No structural configurations assigned.</p>'}
+                        </div>
+                        
+                        <!-- Mini Inline Action Staging Element -->
+                        <div class="grid grid-cols-12 gap-2 bg-slate-950/30 p-2 border border-slate-900 rounded-xl items-center">
+                            <div class="col-span-6">
+                                <input type="text" id="edit-inline-name" class="w-full bg-slate-950 border border-slate-800 rounded-lg py-1.5 px-2.5 text-[11px] text-white focus:outline-none" placeholder="Append New Competitor">
+                            </div>
+                            <div class="col-span-4">
+                                <select id="edit-inline-rank" class="w-full bg-slate-950 border border-slate-800 rounded-lg py-1.5 px-1 text-[10px] text-slate-300 font-medium focus:outline-none">
+                                    <option value="Beginner">Beginner</option>
+                                    <option value="Intermediate" selected>Intermediate</option>
+                                    <option value="Advanced">Advanced</option>
+                                </select>
+                            </div>
+                            <div class="col-span-2">
+                                <button onclick="addPlayerToEditCache()" class="w-full h-full bg-slate-900 border border-slate-800 hover:border-cyan-500/30 text-cyan-400 rounded-lg py-1.5 text-xs flex items-center justify-center transition-all">
+                                    <i class="fa-solid fa-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            `;
 
             showCustomModal({
-                title: 'Delete Team Registration',
-                desc: `Are you sure you want to permanently remove "${teamName}" from the database layout? This action cannot be undone.`,
+                title: 'Modify Team Ecosystem',
+                icon: 'fa-pen-to-square',
+                iconTheme: 'bg-cyan-500/10 border border-cyan-500/20 text-cyan-400',
+                customContent: interfaceContent,
+                actions: [
+                    { text: 'Drop Changes', action: 'hideModal()', style: 'bg-slate-950 border border-slate-800 text-slate-400 hover:text-slate-300' },
+                    { text: 'Commit Sync', action: 'saveTeamEdits()', style: 'bg-gradient-to-r from-cyan-500 to-teal-500 text-slate-950 shadow-lg shadow-cyan-500/10' }
+                ]
+            });
+        }
+
+        function updateEditedPlayerName(index, val) {
+            editingRosterCache[index].name = val.trim();
+        }
+
+        function updateEditedPlayerRank(index, val) {
+            editingRosterCache[index].rank = val;
+        }
+
+        function removePlayerFromEditCache(index) {
+            editingRosterCache.splice(index, 1);
+            const currentNameTitle = document.getElementById('edit-team-name-input').value;
+            renderTeamEditInterface(currentNameTitle);
+        }
+
+        function addPlayerToEditCache() {
+            const nameIn = document.getElementById('edit-inline-name');
+            const rankIn = document.getElementById('edit-inline-rank');
+            const nameVal = nameIn.value.trim();
+            
+            if(!nameVal) return;
+
+            editingRosterCache.push({ name: nameVal, rank: rankIn.value });
+            const currentNameTitle = document.getElementById('edit-team-name-input').value;
+            renderTeamEditInterface(currentNameTitle);
+        }
+
+        function saveTeamEdits() {
+            const finalTeamName = document.getElementById('edit-team-name-input').value.trim();
+            
+            if(!finalTeamName) return;
+            if(editingRosterCache.length === 0) return;
+
+            const baseIndex = tournamentData.findIndex(t => t.id === currentlyEditingTeamId);
+            if(baseIndex !== -1) {
+                tournamentData[baseIndex].name = finalTeamName;
+                tournamentData[baseIndex].players = [...editingRosterCache];
+            }
+
+            hideModal();
+            refreshPreviewUI();
+        }
+
+        // --- END SYSTEM EDIT MODULES ---
+
+        function deleteTeam(id) {
+            const team = tournamentData.find(t => t.id === id);
+            const name = team ? team.name : 'this team';
+
+            showCustomModal({
+                title: 'Delete Team Registry',
+                desc: `Are you sure you want to permanently drop "${name}" out of active processing tables? Data tracks cannot be restored.`,
                 icon: 'fa-trash-can',
                 iconTheme: 'bg-rose-500/10 border border-rose-500/20 text-rose-400',
                 actions: [
-                    { text: 'Cancel', action: 'hideModal()', style: 'bg-slate-700 hover:bg-slate-650 border border-slate-600 text-slate-200' },
-                    { text: 'Confirm Delete', action: `executeDeleteTeam(${id})`, style: 'bg-rose-500 hover:bg-rose-600 text-slate-950 font-semibold shadow-md shadow-rose-500/10' }
+                    { text: 'Cancel', action: 'hideModal()', style: 'bg-slate-950/80 hover:bg-slate-900 border border-slate-800 text-slate-300' },
+                    { text: 'Confirm Delete', action: `executeDeleteTeam(${id})`, style: 'bg-rose-500 hover:bg-rose-600 text-slate-950 shadow-lg shadow-rose-500/15' }
                 ]
             });
         }
 
         function executeDeleteTeam(id) {
-            tournamentData = tournamentData.filter(team => team.id !== id);
+            tournamentData = tournamentData.filter(t => t.id !== id);
             hideModal();
             refreshPreviewUI();
         }
 
-        // Clear all teams confirmation modal wrapper
         function clearAllTeams() {
             if (tournamentData.length === 0) return;
             
             showCustomModal({
-                title: 'Wipe Entire Database',
-                desc: 'Are you absolutely sure you want to wipe all registered teams? This will entirely clear your current tournament configuration draft entries.',
+                title: 'Wipe Core Database Registries',
+                desc: 'Are you absolutely sure you want to drop all active operational data parameters? This action immediately wipes out the local system staging caches.',
                 icon: 'fa-triangle-exclamation',
                 iconTheme: 'bg-rose-500/10 border border-rose-500/20 text-rose-400',
                 actions: [
-                    { text: 'Cancel', action: 'hideModal()', style: 'bg-slate-700 hover:bg-slate-650 border border-slate-600 text-slate-200' },
-                    { text: 'Wipe All Data', action: 'executeClearAllTeams()', style: 'bg-rose-500 hover:bg-rose-600 text-slate-950 font-semibold shadow-md shadow-rose-500/10' }
+                    { text: 'Cancel', action: 'hideModal()', style: 'bg-slate-950/80 hover:bg-slate-900 border border-slate-800 text-slate-300' },
+                    { text: 'Wipe All Data', action: 'executeClearAllTeams()', style: 'bg-rose-500 hover:bg-rose-600 text-slate-950 shadow-lg shadow-rose-500/15' }
                 ]
             });
         }
@@ -415,17 +545,16 @@
             refreshPreviewUI();
         }
 
-        // Badge color engine parser
         function getRankStyle(rank) {
             switch(rank) {
-                case 'Advanced': return 'bg-cyan-500/10 border-cyan-500/20 text-cyan-400';
-                case 'Intermediate': return 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400';
-                case 'Beginner': return 'bg-amber-500/10 border-amber-500/20 text-amber-400';
-                default: return 'bg-slate-700/40 border-slate-600/40 text-slate-300';
+                case 'Advanced': return 'bg-cyan-500/5 border-cyan-500/20 text-cyan-400';
+                case 'Intermediate': return 'bg-emerald-500/5 border-emerald-500/20 text-emerald-400';
+                case 'Beginner': return 'bg-amber-500/5 border-amber-500/20 text-amber-400';
+                default: return 'bg-slate-900 border-slate-800 text-slate-400';
             }
         }
 
-        // Preview Layout Engine
+        // Live Metric Parsing & Card Creation Dynamic Engine UI
         function refreshPreviewUI() {
             const previewList = document.getElementById('preview-list');
             const emptyState = document.getElementById('empty-state');
@@ -435,7 +564,7 @@
             const intEl = document.getElementById('count-int');
             const advEl = document.getElementById('count-adv');
 
-            counter.innerText = tournamentData.length === 1 ? "1 Team Registered" : `${tournamentData.length} Teams Registered`;
+            counter.innerText = tournamentData.length === 1 ? "1 Team Configured" : `${tournamentData.length} Teams Configured`;
 
             const activeCards = previewList.querySelectorAll('.staged-team-card');
             activeCards.forEach(card => card.remove());
@@ -447,44 +576,48 @@
             }
 
             emptyState.classList.add('hidden');
-
             let totals = { Beginner: 0, Intermediate: 0, Advanced: 0 };
 
             tournamentData.forEach((team) => {
                 const card = document.createElement('div');
-                card.className = "staged-team-card bg-slate-900/80 border border-slate-800/80 rounded-2xl overflow-hidden shadow-lg transition-all hover:border-slate-700/80 group";
+                card.className = "staged-team-card bg-slate-900/40 border border-slate-900 rounded-2xl overflow-hidden shadow-xl transition-all duration-300 hover:border-slate-800/80 group";
                 
                 const playerRowsHTML = team.players.map(p => {
                     totals[p.rank] = (totals[p.rank] || 0) + 1;
                     return `
-                        <div class="flex items-center justify-between bg-slate-950/40 border border-slate-800/40 rounded-xl px-3 py-2 text-xs">
-                            <div class="flex items-center gap-2">
-                                <div class="w-5 h-5 bg-slate-800 rounded-full flex items-center justify-center text-[10px] text-slate-400 font-medium">
+                        <div class="flex items-center justify-between bg-slate-950/40 border border-slate-900/50 rounded-xl px-3 py-2.5 text-xs font-medium">
+                            <div class="flex items-center gap-2.5 overflow-hidden">
+                                <div class="w-5 h-5 bg-slate-900 border border-slate-800 rounded-md flex items-center justify-center text-[10px] text-slate-400 font-bold flex-shrink-0">
                                     ${p.name.charAt(0).toUpperCase()}
                                 </div>
-                                <span class="text-slate-200 font-medium truncate max-w-[140px]">${p.name}</span>
+                                <span class="text-slate-300 truncate max-w-[130px] tracking-wide">${p.name}</span>
                             </div>
-                            <span class="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded border ${getRankStyle(p.rank)}">${p.rank}</span>
+                            <span class="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 border rounded-md ${getRankStyle(p.rank)}">${p.rank}</span>
                         </div>
                     `;
                 }).join('');
 
                 card.innerHTML = `
-                    <div class="bg-slate-950/60 border-b border-slate-800/60 px-4 py-3 flex items-center justify-between gap-3">
-                        <div class="flex items-center gap-2.5 overflow-hidden">
-                            <div class="w-8 h-8 bg-gradient-to-tr from-slate-800 to-slate-700 border border-slate-700/60 rounded-lg flex items-center justify-center text-slate-300 shadow-sm flex-shrink-0">
+                    <div class="bg-slate-950/40 border-b border-slate-900/80 px-4 py-3.5 flex items-center justify-between gap-3">
+                        <div class="flex items-center gap-3 overflow-hidden">
+                            <div class="w-8 h-8 bg-slate-950 border border-slate-800 rounded-xl flex items-center justify-center shadow-inner flex-shrink-0">
                                 <i class="fa-solid fa-shield-halved text-xs text-cyan-400"></i>
                             </div>
                             <div class="overflow-hidden">
-                                <h4 class="text-sm font-semibold text-white tracking-tight truncate">${team.name}</h4>
-                                <p class="text-[10px] text-slate-500 font-medium uppercase tracking-wider mt-0.5">${team.players.length} Competitors</p>
+                                <h4 class="text-xs sm:text-sm font-bold text-white tracking-tight truncate">${team.name}</h4>
+                                <p class="text-[9px] text-slate-500 font-bold uppercase tracking-widest mt-0.5">${team.players.length} Competitors Indexed</p>
                             </div>
                         </div>
-                        <button onclick="deleteTeam(${team.id})" class="text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 w-7 h-7 rounded-lg transition-all flex items-center justify-center flex-shrink-0" title="Delete Team Block">
-                            <i class="fa-solid fa-trash text-xs"></i>
-                        </button>
+                        <div class="flex items-center gap-1 flex-shrink-0">
+                            <button onclick="openEditTeamModal(${team.id})" class="text-slate-500 hover:text-cyan-400 hover:bg-cyan-500/10 w-8 h-8 rounded-xl transition-all flex items-center justify-center border border-transparent" title="Edit Configuration Matrix">
+                                <i class="fa-solid fa-pen-to-square text-xs"></i>
+                            </button>
+                            <button onclick="deleteTeam(${team.id})" class="text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 w-8 h-8 rounded-xl transition-all flex items-center justify-center border border-transparent" title="Delete Team Stack Profile">
+                                <i class="fa-solid fa-trash text-xs"></i>
+                            </button>
+                        </div>
                     </div>
-                    <div class="p-3.5 bg-slate-900/40 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <div class="p-4 bg-slate-900/10 grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                         ${playerRowsHTML}
                     </div>
                 `;
@@ -496,33 +629,30 @@
             advEl.innerText = totals.Advanced;
         }
 
-        // Matchmaking compiler engine router
+        // Framework Generation & Route Core Matrix Actions
         function launchMatchmaking(btnElement) {
             if (tournamentData.length < 2) {
                 showCustomModal({
-                    title: 'Insufficent Metrics',
-                    desc: 'Please establish a valid layout containing at least 2 complete teams before compiling matchmaking matrices.',
+                    title: 'Insufficient Matrix Registries',
+                    desc: 'A minimum cluster mapping threshold containing at least 2 complete teams is required before structural match equations can calculate configurations.',
                     icon: 'fa-network-wired',
                     iconTheme: 'bg-amber-500/10 border border-amber-500/20 text-amber-400',
-                    actions: [{ text: 'Close', action: 'hideModal()', style: 'bg-slate-700 hover:bg-slate-600 text-white' }]
+                    actions: [{ text: 'Close', action: 'hideModal()', style: 'bg-slate-950/80 hover:bg-slate-900 border border-slate-800 text-slate-200' }]
                 });
                 return;
             }
 
             btnElement.disabled = true;
             btnElement.innerHTML = `
-                <span>Compiling Matrix Data</span>
-                <i class="fa-solid fa-circle-notch text-xs animate-spin"></i>
+                <span>Compiling Matrix Pipelines</span>
+                <i class="fa-solid fa-circle-notch text-xs animate-spin ml-1"></i>
             `;
 
             setTimeout(() => {
                 const bodyOverlay = document.getElementById('body-overlay');
                 bodyOverlay.classList.add('opacity-0');
-
-                setTimeout(() => {
-                    window.location.href = 'matches.html'; // Target updated to matches.html
-                }, 700);
-            }, 1400);
+                setTimeout(() => { window.location.href = 'matches.html'; }, 700);
+            }, 1300);
         }
     </script>
 </body>
