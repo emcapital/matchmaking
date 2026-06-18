@@ -32,7 +32,13 @@ A high-performance, hyper-responsive, and visually stunning web dashboard design
 ### 1. File Structure Deployment
 Ensure your production directories match the routing keys embedded inside the dashboard elements:
 ```text
-├── project-root/
-│   ├── login.html             # Upstream secure authentication portal
-│   └── dashboard/
-│       └── team.html          # This module frame file
+├── matchmaking
+│   └── index.html
+│   ├── components
+│   │   └── clubs.html
+│   │   └── display.html
+│   │   └── history.html
+│   │   └── matches.html
+│   │    └── teams.html
+│   └── matches
+│       └── team.html
