@@ -33,12 +33,12 @@ A high-performance, hyper-responsive, and visually stunning web dashboard design
 Ensure your production directories match the routing keys embedded inside the dashboard elements:
 ```text
 ├── matchmaking
-│   └── index.html
+│   ├── index.html
 │   ├── components
 │   │   └── clubs.html
 │   │   └── display.html
 │   │   └── history.html
 │   │   └── matches.html
-│   │    └── teams.html
+│   │   └── teams.html
 │   └── matches
 │       └── team.html
